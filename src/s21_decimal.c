@@ -1,15 +1,19 @@
-typedef struct {
-  int bits[4];
-} s21_decimal;
-
-#include <stdbool.h>
+#include <stdio.h>
 
 #define bool _Bool
 #define true 1
 #define false 0
+#define MINUS_BIT (1 << 31)
+
+#ifndef NULL
 #define NULL ((void *)0)
+#endif
 
 #define abs(x) ((x) < 0 ? -(x) : (x))
+
+typedef struct {
+  int bits[4];
+} s21_decimal;
 
 void nullOut(s21_decimal *dst) {
   dst->bits[0] = 0;
@@ -22,16 +26,8 @@ int s21_from_int_to_decimal(int src, s21_decimal *dst) {
   if (dst == NULL) return 1;
 
   nullOut(dst);
-
-  if (src == -__INT_MAX__) {
-    dst->bits[0] = __INT_MAX__;
-    dst->bits[3] |= (1 << 31);
-  } else {
-    bool negative = (src < 0) ? true : false;
-    int value = (negative) ? -src : src;
-    dst->bits[0] = value;
-    if (negative) dst->bits[3] |= (1 << 31);
-  }
+  dst->bits[0] = abs(src);
+  if (src < 0) dst->bits[3] |= MINUS_BIT;
   return 0;
 }
 
@@ -42,8 +38,9 @@ int s21_from_decimal_to_int(s21_decimal src, int *dst) {
 }
 
 int main(void) {
-  int number = 0;
+  int number = -__INT_MAX__;
   s21_decimal value;
   s21_from_int_to_decimal(number, &value);
+  printf("%d", value.bits[0]);
   return 0;
 }
