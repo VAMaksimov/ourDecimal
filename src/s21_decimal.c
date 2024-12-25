@@ -3,12 +3,12 @@
 #define bool _Bool
 #define true 1
 #define false 0
-#define MINUS_BIT (1 << 31)
 
 #ifndef NULL
 #define NULL ((void *)0)
 #endif
 
+#define MINUS_BIT (1 << 31)
 #define abs(x) ((x) < 0 ? -(x) : (x))
 
 typedef struct {
@@ -32,13 +32,16 @@ int s21_from_int_to_decimal(int src, s21_decimal *dst) {
 }
 
 int s21_from_decimal_to_int(s21_decimal src, int *dst) {
+  if (dst == NULL) return 1;
+
   *dst = src.bits[0];
   bool negative = (src.bits[3] & (1 << 31)) ? true : false;
   if (negative) *dst = -(*dst);
+  return 0;
 }
 
 int main(void) {
-  int number = -__INT_MAX__;
+  int number = -__INT_MAX__ - 1;
   s21_decimal value;
   s21_from_int_to_decimal(number, &value);
   printf("%d", value.bits[0]);
