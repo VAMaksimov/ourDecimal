@@ -35,7 +35,7 @@ int s21_from_decimal_to_int(s21_decimal src, int *dst) {
   if (dst == NULL) return 1;
 
   *dst = src.bits[0];
-  bool negative = (src.bits[3] & (1 << 31)) ? true : false;
+  bool negative = (src.bits[3] & MINUS_BIT) ? true : false;
   if (negative) *dst = -(*dst);
   return 0;
 }
