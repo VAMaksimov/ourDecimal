@@ -17,7 +17,7 @@
 #define ADDITIONAL_INT_BIT 95
 #define MINUS_BIT_INDEX 127
 
-#define __INT_MIN__ __INT_MAX__ + 1
+#define __INT_MIN__ -2147483648
 
 #define abs(x) ((x) < 0 ? -(x) : (x))
 #define getRow(x) (x / COLUMN_NUMBER) % ROW_NUMBER
