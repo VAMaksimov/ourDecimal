@@ -1,7 +1,5 @@
 #include "test.h"
 
-#include <check.h>
-
 void assertDecimal(s21_decimal expected, s21_decimal actual) {
   int row = ROW_NUMBER;
   while (row--) ck_assert_int_eq(expected.bits[row], actual.bits[row]);
@@ -38,11 +36,9 @@ Suite *s21_decimal_suite(void) {
   Suite *suite = suite_create("s21_decimal");
   TCase *tc_core = tcase_create("Core");
 
-  for (int i = 1; i <= 3; i++) {
-    char test_name[20];
-    snprintf(test_name, sizeof(test_name), "standard_%d", i);
-    tcase_add_test(tc_core, tcase_fn_lookup(test_name));
-  }
+  tcase_add_test(tc_core, standard_1);
+  tcase_add_test(tc_core, standard_2);
+  tcase_add_test(tc_core, standard_3);
 
   suite_add_tcase(suite, tc_core);
   return suite;

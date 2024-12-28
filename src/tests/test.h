@@ -1,6 +1,8 @@
 #ifndef TEST_H
 #define TEST_H
 
+#include <check.h>
+
 #include "../s21_decimal.h"
 
 #define __DECIMAL_FULL_ROW__ 0xffffffff
