@@ -1,36 +1,47 @@
 #include "../s21_decimal.h"
 
+/**
+ * @brief convert int to decimal
+ * @param src int value
+ * @param dst pointer to the decimal structure
+ */
 int s21_from_int_to_decimal(int src, s21_decimal *dst) {
-  if (dst == NULL) return 1;
+  if (dst == NULL) return CONVERTATION_ERROR;
 
-  nullOut(dst);
-  dst->bits[0] = abs(src);
+  nullOutDecimal(dst);
+  dst->bits[2] = abs(src);
   if (src < 0) setBit(dst, MINUS_BIT_INDEX);
-  return 0;
+
+  return CONVERTATION_SUCCESS;
 }
 
+/**
+ * @brief converts decimal to int
+ * @param src decimal value
+ * @param dst pointer to the int structure
+ */
 int s21_from_decimal_to_int(s21_decimal src, int *dst) {
-  if (dst == NULL || src.bits[1] || src.bits[2] ||
+  if (dst == NULL || src.bits[0] || src.bits[1] ||
       isSetBit(src, ADDITIONAL_INT_BIT))
-    return 1;
+    return CONVERTATION_ERROR;
 
-  *dst = src.bits[0];
-  if (isSetBit(src, MINUS_BIT_INDEX)) *dst = -(*dst);
-  return 0;
+  *dst = src.bits[2];
+  if (isSetBit(src, MINUS_BIT_INDEX)) *dst = ~(*dst) + 1;
+  return CONVERTATION_SUCCESS;
 }
 
-int s21_from_float_to_decimal(float src, s21_decimal *dst) {
-  if (dst == NULL) return 1;
+// int s21_from_float_to_decimal(float src, s21_decimal *dst) {
+//   if (dst == NULL) return 1;
 
-  nullOut(dst);
-}
+//   nullOutDecimal(dst);
+// }
 
-int s21_from_decimal_to_float(s21_decimal src, float *dst) {}
+// int s21_from_decimal_to_float(s21_decimal src, float *dst) {}
 
-int main(void) {
-  int number = __INT_MIN__;
-  s21_decimal value;
-  s21_from_int_to_decimal(number, &value);
-  printf("%d", value.bits[0]);
-  return 0;
-}
+// int main(void) {
+//   int number = __INT_MIN__;
+//   s21_decimal value;
+//   s21_from_int_to_decimal(number, &value);
+//   printf("%d", value.bits[0]);
+//   return 0;
+// }
