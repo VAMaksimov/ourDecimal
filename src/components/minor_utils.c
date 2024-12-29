@@ -5,6 +5,11 @@ void nullOutDecimal(s21_decimal *dst) {
   while (row--) dst->bits[row] = 0;
 }
 
+void nullOutLongDecimal(s21_long_decimal *dst) {
+  int row = LONG_ROW_NUMBER;
+  while (row--) dst->bits[row] = 0;
+}
+
 void negateDecimal(s21_decimal *dst) {
   int row = ROW_NUMBER;
   while (row--) dst->bits[row] = ~dst->bits[row] + 1;
@@ -18,6 +23,10 @@ void setBit(s21_decimal *dst, int index) {
   dst->bits[getRow(index)] |= (1 << getColumn(index));
 }
 
+void setLongBit(s21_long_decimal *dst, int index) {
+  dst->bits[getRow(index)] |= (1 << getColumn(index));
+}
+
 void inverseBit(s21_decimal *dst, int index) {
   dst->bits[getRow(index)] ^= (1 << getColumn(index));
 }
@@ -26,11 +35,15 @@ void resetBit(s21_decimal *dst, int index) {
   dst->bits[getRow(index)] &= ~((1 << getColumn(index)));
 }
 
+void resetLongBit(s21_long_decimal *dst, int index) {
+  dst->bits[getRow(index)] &= ~((1 << getColumn(index)));
+}
+
 int get_scale(s21_decimal num) { return num.bits[3] >> 16; }
 
 bool isCorrectDecimal(s21_decimal *num) {
   return num != NULL && get_scale(*num) <= 28 &&
-         (num->bits[3] | (0b01111111000000001111111111111111));
+         !(num->bits[3] & (0b01111111000000001111111111111111));
 }
 
 // bool s21_truncate(s21_decimal *value) {
