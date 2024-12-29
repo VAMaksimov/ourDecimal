@@ -4,7 +4,7 @@
 
 START_TEST(standard_1) {
   int subject = 1;
-  s21_decimal actual, expected = {{0, 0, 1, __DECIMAL_POSITIVE_INT_INFO__}};
+  s21_decimal actual, expected = {{1, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}};
   int result = s21_from_int_to_decimal(subject, &actual);
   assertDecimal(expected, actual);
   ck_assert_int_eq(result, CONVERTATION_SUCCESS);
@@ -22,7 +22,7 @@ END_TEST
 
 START_TEST(standard_3) {
   int subject = -1;
-  s21_decimal actual, expected = {{0, 0, 1, __DECIMAL_NEGATIVE_INT_INFO__}};
+  s21_decimal actual, expected = {{1, 0, 0, __DECIMAL_NEGATIVE_INT_INFO__}};
   int result = s21_from_int_to_decimal(subject, &actual);
   assertDecimal(expected, actual);
   ck_assert_int_eq(result, CONVERTATION_SUCCESS);
@@ -32,7 +32,7 @@ END_TEST
 START_TEST(standard_4) {
   int subject = -9999999;
   s21_decimal actual,
-      expected = {{0, 0, 0x98967f, __DECIMAL_NEGATIVE_INT_INFO__}};
+      expected = {{0x98967f, 0, 0, __DECIMAL_NEGATIVE_INT_INFO__}};
   int result = s21_from_int_to_decimal(subject, &actual);
   assertDecimal(expected, actual);
   ck_assert_int_eq(result, CONVERTATION_SUCCESS);
@@ -42,7 +42,7 @@ END_TEST
 START_TEST(standard_5) {
   int subject = 7654321;
   s21_decimal actual,
-      expected = {{0, 0, 0x74CBB1, __DECIMAL_POSITIVE_INT_INFO__}};
+      expected = {{0x74CBB1, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}};
   int result = s21_from_int_to_decimal(subject, &actual);
   assertDecimal(expected, actual);
   ck_assert_int_eq(result, CONVERTATION_SUCCESS);
@@ -60,7 +60,7 @@ END_TEST
 
 START_TEST(border_2) {
   int subject = __INT_MAX__;
-  s21_decimal actual, expected = {{0, 0, __DECIMAL_LOWER_MIDPOINT__,
+  s21_decimal actual, expected = {{__DECIMAL_LOWER_MIDPOINT__, 0, 0,
                                    __DECIMAL_POSITIVE_INT_INFO__}};
   int result = s21_from_int_to_decimal(subject, &actual);
   assertDecimal(expected, actual);
@@ -71,7 +71,7 @@ END_TEST
 /* s21_from_decimal_to_int */
 
 START_TEST(standard_6) {
-  s21_decimal subject = {{0, 0, 1, __DECIMAL_POSITIVE_INT_INFO__}};
+  s21_decimal subject = {{1, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}};
   int actual, expected = 1;
   int result = s21_from_decimal_to_int(subject, &actual);
   ck_assert_int_eq(expected, actual);
@@ -89,7 +89,7 @@ START_TEST(standard_7) {
 END_TEST
 
 START_TEST(standard_8) {
-  s21_decimal subject = {{0, 0, 1, __DECIMAL_NEGATIVE_INT_INFO__}};
+  s21_decimal subject = {{1, 0, 0, __DECIMAL_NEGATIVE_INT_INFO__}};
   int actual, expected = -1;
   int result = s21_from_decimal_to_int(subject, &actual);
   ck_assert_int_eq(expected, actual);
@@ -98,7 +98,7 @@ START_TEST(standard_8) {
 END_TEST
 
 START_TEST(standard_9) {
-  s21_decimal subject = {{0, 0, 0x98967f, __DECIMAL_NEGATIVE_INT_INFO__}};
+  s21_decimal subject = {{0x98967f, 0, 0, __DECIMAL_NEGATIVE_INT_INFO__}};
   int actual, expected = -9999999;
   int result = s21_from_decimal_to_int(subject, &actual);
   ck_assert_int_eq(expected, actual);
@@ -107,7 +107,7 @@ START_TEST(standard_9) {
 END_TEST
 
 START_TEST(standard_10) {
-  s21_decimal subject = {{0, 0, 0x74CBB1, __DECIMAL_POSITIVE_INT_INFO__}};
+  s21_decimal subject = {{0x74CBB1, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}};
   int actual, expected = 7654321;
   int result = s21_from_decimal_to_int(subject, &actual);
   ck_assert_int_eq(expected, actual);
@@ -126,7 +126,7 @@ END_TEST
 
 START_TEST(border_4) {
   s21_decimal subject = {
-      {0, 0, __DECIMAL_LOWER_MIDPOINT__, __DECIMAL_POSITIVE_INT_INFO__}};
+      {__DECIMAL_LOWER_MIDPOINT__, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}};
   int actual, expected = __INT_MAX__;
   int result = s21_from_decimal_to_int(subject, &actual);
   ck_assert_int_eq(expected, actual);
@@ -145,7 +145,7 @@ END_TEST
 
 START_TEST(irregular_2) {
   s21_decimal subject = {
-      {0, 0, __DECIMAL_UPPER_MIDPOINT__, __DECIMAL_POSITIVE_INT_INFO__}};
+      {__DECIMAL_UPPER_MIDPOINT__, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}};
   int actual = 0, expected = 0;
   int result = s21_from_decimal_to_int(subject, &actual);
   ck_assert_int_eq(expected, actual);
@@ -155,7 +155,7 @@ END_TEST
 
 START_TEST(irregular_3) {
   s21_decimal subject = {
-      {0, 0, __DECIMAL_UPPER_MIDPOINT__, __DECIMAL_NEGATIVE_INT_INFO__}};
+      {__DECIMAL_UPPER_MIDPOINT__, 0, 0, __DECIMAL_NEGATIVE_INT_INFO__}};
   int actual = 0, expected = 0;
   int result = s21_from_decimal_to_int(subject, &actual);
   ck_assert_int_eq(expected, actual);
