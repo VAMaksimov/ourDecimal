@@ -68,17 +68,26 @@ void multiply10(s21_decimal *src, int *errorType) {
   addition(*src, temp, src);
 }
 
+/*
+number 1:
+row\col | 3 | 2 | 1 | 0 |
+-------------------------
+0       | 0 | 0 | 0 | 1 |
+1       | 0 | 0 | 0 | 0 |
+2       | 0 | 0 | 0 | 0 |
+*/
 int shift_left(s21_decimal *src, int shift, int *errorType) {
   while (shift--) {
     if (isSetBit(*src, VALUE_PART_SIZE - 1)) {
       errorType = NUMBER_TOO_LARGE;
     } else {
-      for (int bit_index = VALUE_PART_SIZE - 1; bit_index >= 0; bit_index--) {
+      for (int bit_index = VALUE_PART_SIZE - 1; bit_index > 0; bit_index--) {
         if (isSetBit(*src, bit_index - 1)) {
           setBit(src, bit_index);
           resetBit(src, bit_index - 1);
         }
       }
+      resetBit(src, 0);
     }
   }
 }
