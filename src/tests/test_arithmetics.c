@@ -2,13 +2,18 @@
 
 /* s21_from_int_to_decimal */
 
+void performAddition(s21_decimal subject1, s21_decimal subject2,
+                     s21_decimal expected, s21_decimal *actual, int errorType) {
+  int result = s21_add(subject1, subject2, actual);
+  assertDecimal(expected, *actual);
+  ck_assert_int_eq(result, errorType);
+}
+
 START_TEST(standard_1) {
   s21_decimal subject1 = {{1, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}},
               subject2 = {{1, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}};
   s21_decimal actual, expected = {{2, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, ADD_OK);
+  performAddition(subject1, subject2, expected, &actual, ADD_OK);
 }
 END_TEST
 
@@ -16,9 +21,7 @@ START_TEST(standard_2) {
   s21_decimal subject1 = {{1, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}},
               subject2 = {{0, 1, 0, __DECIMAL_POSITIVE_INT_INFO__}};
   s21_decimal actual, expected = {{1, 1, 0, __DECIMAL_POSITIVE_INT_INFO__}};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, ADD_OK);
+  performAddition(subject1, subject2, expected, &actual, ADD_OK);
 }
 END_TEST
 
@@ -26,9 +29,7 @@ START_TEST(standard_3) {
   s21_decimal subject1 = {{25, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}},
               subject2 = {{75, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}};
   s21_decimal actual, expected = {{100, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, ADD_OK);
+  performAddition(subject1, subject2, expected, &actual, ADD_OK);
 }
 END_TEST
 
@@ -37,9 +38,7 @@ START_TEST(standard_4) {
                            __DECIMAL_POSITIVE_INT_INFO__}},
               subject2 = {{1, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}};
   s21_decimal actual, expected = {{0, 1, 0, __DECIMAL_POSITIVE_INT_INFO__}};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, ADD_OK);
+  performAddition(subject1, subject2, expected, &actual, ADD_OK);
 }
 END_TEST
 
@@ -50,9 +49,7 @@ START_TEST(standard_5) {
                   {__DECIMAL_FULL_ROW__, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}};
   s21_decimal actual, expected = {{__DECIMAL_FULL_ROW__ - 1, 1, 0,
                                    __DECIMAL_POSITIVE_INT_INFO__}};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, ADD_OK);
+  performAddition(subject1, subject2, expected, &actual, ADD_OK);
 }
 END_TEST
 
@@ -60,9 +57,7 @@ START_TEST(standard_6) {
   s21_decimal subject1 = {{25, 0, 0, __POSITIVE_AND_SCALE_EQUALS_1__}},
               subject2 = {{75, 0, 0, __POSITIVE_AND_SCALE_EQUALS_1__}};
   s21_decimal actual, expected = {{100, 0, 0, __POSITIVE_AND_SCALE_EQUALS_1__}};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, ADD_OK);
+  performAddition(subject1, subject2, expected, &actual, ADD_OK);
 }
 END_TEST
 
@@ -71,9 +66,7 @@ START_TEST(standard_7) {
                            __POSITIVE_AND_SCALE_EQUALS_8__}},
               subject2 = {{1, 0, 0, __POSITIVE_AND_SCALE_EQUALS_8__}};
   s21_decimal actual, expected = {{0, 1, 0, __POSITIVE_AND_SCALE_EQUALS_8__}};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, ADD_OK);
+  performAddition(subject1, subject2, expected, &actual, ADD_OK);
 }
 END_TEST
 
@@ -83,9 +76,7 @@ START_TEST(standard_8) {
               subject2 = {{1, 0, 0, __NEGATIVE_AND_SCALE_EQUALS_1__}};
   s21_decimal actual, expected = {{__DECIMAL_FULL_ROW__ - 1, 0, 0,
                                    __POSITIVE_AND_SCALE_EQUALS_1__}};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, ADD_OK);
+  performAddition(subject1, subject2, expected, &actual, ADD_OK);
 }
 END_TEST
 
@@ -93,9 +84,7 @@ START_TEST(standard_9) {
   s21_decimal subject1 = {{25, 0, 0, __POSITIVE_AND_SCALE_EQUALS_1__}},
               subject2 = {{75, 0, 0, __NEGATIVE_AND_SCALE_EQUALS_1__}};
   s21_decimal actual, expected = {{50, 0, 0, __NEGATIVE_AND_SCALE_EQUALS_1__}};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, ADD_OK);
+  performAddition(subject1, subject2, expected, &actual, ADD_OK);
 }
 END_TEST
 
@@ -103,9 +92,7 @@ START_TEST(standard_10) {
   s21_decimal subject1 = {{25, 0, 0, __NEGATIVE_AND_SCALE_EQUALS_8__}},
               subject2 = {{75, 0, 0, __NEGATIVE_AND_SCALE_EQUALS_8__}};
   s21_decimal actual, expected = {{100, 0, 0, __NEGATIVE_AND_SCALE_EQUALS_8__}};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, ADD_OK);
+  performAddition(subject1, subject2, expected, &actual, ADD_OK);
 }
 END_TEST
 
@@ -113,9 +100,7 @@ START_TEST(standard_11) {
   s21_decimal subject1 = {{2, 0, 0, __POSITIVE_AND_SCALE_EQUALS_1__}},
               subject2 = {{1, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}};
   s21_decimal actual, expected = {{12, 0, 0, __POSITIVE_AND_SCALE_EQUALS_1__}};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, ADD_OK);
+  performAddition(subject1, subject2, expected, &actual, ADD_OK);
 }
 END_TEST
 
@@ -124,9 +109,7 @@ START_TEST(standard_12) {
               subject2 = {{1, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}};
   s21_decimal actual,
       expected = {{100000000, 0, 0, __POSITIVE_AND_SCALE_EQUALS_8__}};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, ADD_OK);
+  performAddition(subject1, subject2, expected, &actual, ADD_OK);
 }
 END_TEST
 
@@ -135,9 +118,7 @@ START_TEST(standard_13) {
               subject2 = {{1, 0, 0, __DECIMAL_NEGATIVE_INT_INFO__}};
   s21_decimal actual,
       expected = {{99999999, 0, 0, __NEGATIVE_AND_SCALE_EQUALS_8__}};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, ADD_OK);
+  performAddition(subject1, subject2, expected, &actual, ADD_OK);
 }
 END_TEST
 
@@ -148,9 +129,7 @@ START_TEST(standard_14) {
   s21_decimal actual,
       expected = {{__DECIMAL_FULL_ROW__, __DECIMAL_FULL_ROW__,
                    __DECIMAL_FULL_ROW__ - 1, __DECIMAL_POSITIVE_INT_INFO__}};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, ADD_OK);
+  performAddition(subject1, subject2, expected, &actual, ADD_OK);
 }
 END_TEST
 
@@ -160,9 +139,7 @@ START_TEST(border_1) {
                            __DECIMAL_POSITIVE_INT_INFO__}},
               subject2 = {{1, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}};
   s21_decimal actual = {0}, expected = {0};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, NUMBER_TOO_LARGE);
+  performAddition(subject1, subject2, expected, &actual, NUMBER_TOO_LARGE);
 }
 END_TEST
 
@@ -173,9 +150,7 @@ START_TEST(border_2) {
               subject2 = {
                   {__DECIMAL_FULL_ROW__, 0, 0, __DECIMAL_NEGATIVE_INT_INFO__}};
   s21_decimal actual = {0}, expected = {0};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, NUMBER_TOO_SMALL);
+  performAddition(subject1, subject2, expected, &actual, NUMBER_TOO_SMALL);
 }
 END_TEST
 
@@ -184,9 +159,7 @@ START_TEST(border_3) {
                            __DECIMAL_NEGATIVE_INT_INFO__}},
               subject2 = {{__DECIMAL_FULL_ROW__, 0, 0, __SCALE_IS_TOO_BIG__}};
   s21_decimal actual = {0}, expected = {0};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, NUMBER_TOO_SMALL);
+  performAddition(subject1, subject2, expected, &actual, NUMBER_TOO_SMALL);
 }
 END_TEST
 
@@ -198,9 +171,7 @@ START_TEST(border_4) {
   s21_decimal actual,
       expected = {{__DECIMAL_FULL_ROW__, __DECIMAL_FULL_ROW__,
                    __DECIMAL_FULL_ROW__, __DECIMAL_NEGATIVE_INT_INFO__}};
-  int result = s21_add(subject1, subject2, &actual);
-  assertDecimal(expected, actual);
-  ck_assert_int_eq(result, ADD_OK);
+  performAddition(subject1, subject2, expected, &actual, ADD_OK);
 }
 END_TEST
 
