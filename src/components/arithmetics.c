@@ -8,9 +8,9 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   int errrorType = ADD_OK;
 
   alignScale(&value_1, &value_2, &errrorType);
-  setScale(result, max(getScale(value_1), getScale(value_2)));
 
   if (errrorType == ADD_OK) {
+    setScale(result, max(getScale(value_1), getScale(value_2)));
     if (isSetBit(value_1, MINUS_BIT_INDEX) ==
         isSetBit(value_2, MINUS_BIT_INDEX)) {
       addition(value_1, value_2, result, &errrorType);
@@ -24,9 +24,8 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
         copySign(value_2, result);
       }
     }
-    printf("%d and %d\n", isSetBit(value_1, MINUS_BIT_INDEX),
-           isSetBit(value_2, MINUS_BIT_INDEX));
   }
+  if (errrorType) resetDecimal(result);
   return errrorType;
 }
 
@@ -71,7 +70,12 @@ void addition(s21_decimal a, s21_decimal b, s21_decimal *result,
 
     carry = sum / 2;
   }
-  if (carry) *errorType = NUMBER_TOO_LARGE;
+  if (carry) {
+    if (isSetBit(a, MINUS_BIT_INDEX))
+      *errorType = NUMBER_TOO_SMALL;
+    else
+      *errorType = NUMBER_TOO_LARGE;
+  }
 }
 
 // s21_long_decimal subtraction(s21_long_decimal a, s21_long_decimal b,
@@ -117,5 +121,10 @@ void subtraction(s21_decimal a, s21_decimal b, s21_decimal *result,
 
     borrow = diff < 0;
   }
-  if (borrow) *errorType = NUMBER_TOO_SMALL;
+  if (borrow) {
+    if (isSetBit(a, MINUS_BIT_INDEX))
+      *errorType = NUMBER_TOO_SMALL;
+    else
+      *errorType = NUMBER_TOO_LARGE;
+  }
 }

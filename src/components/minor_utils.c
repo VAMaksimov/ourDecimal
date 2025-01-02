@@ -48,7 +48,7 @@ void resetLongBit(s21_long_decimal *dst, int index) {
   dst->bits[getRow(index)] &= ~((1 << getColumn(index)));
 }
 
-int getScale(s21_decimal num) { return num.bits[3] >> 16; }
+int getScale(s21_decimal num) { return (num.bits[3] << 1) >> 17; }
 
 void setScale(s21_decimal *num, int scale) { num->bits[3] = scale << 16; }
 
@@ -102,7 +102,7 @@ void shift_left(s21_decimal *src, int shift, int *errorType) {
 bool isIntPartBigger(s21_decimal value_1, s21_decimal value_2) {
   bool result = false;
   for (int i = ROW_NUMBER - 1; i >= 0; i--) {
-    if (value_1.bits[i] > value_2.bits[i]) {
+    if ((unsigned int)value_1.bits[i] > (unsigned int)value_2.bits[i]) {
       result = true;
       break;
     }
@@ -110,8 +110,8 @@ bool isIntPartBigger(s21_decimal value_1, s21_decimal value_2) {
   return result;
 }
 
-void copySign(s21_decimal value_1, s21_decimal *result) {
-  if (isSetBit(value_1, MINUS_BIT_INDEX))
+void copySign(s21_decimal value, s21_decimal *result) {
+  if (isSetBit(value, MINUS_BIT_INDEX))
     setBit(result, MINUS_BIT_INDEX);
   else
     resetBit(result, MINUS_BIT_INDEX);
