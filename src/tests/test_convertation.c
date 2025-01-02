@@ -174,7 +174,7 @@ START_TEST(irregular_4) {
 END_TEST
 
 Suite *convert_suite(void) {
-  Suite *suite = suite_create("s21_decimal");
+  Suite *suite = suite_create("convertation");
   TCase *int_to_dec = tcase_create("Core");
   TCase *dec_to_int = tcase_create("Core");
 

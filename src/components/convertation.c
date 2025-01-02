@@ -8,7 +8,7 @@
 int s21_from_int_to_decimal(int src, s21_decimal *dst) {
   if (dst == NULL) return CONVERTATION_ERROR;
 
-  nullOutDecimal(dst);
+  resetDecimal(dst);
   dst->bits[0] = abs(src);
   resetBit(dst, ADDITIONAL_INT_BIT);
   if (src < 0) setBit(dst, MINUS_BIT_INDEX);

@@ -40,30 +40,51 @@ typedef struct {
 
 #define __INT_MIN__ 0x80000000
 
+#define max(x, y) ((x) > (y) ? (x) : (y))
 #define abs(x) ((x) < 0 ? -(x) : (x))
 #define getRow(x) (x / COLUMN_NUMBER)
 #define getColumn(x) (x % COLUMN_NUMBER)
 
 // minor_utils
+void resetDecimal(s21_decimal *dst);
 void nullOutDecimal(s21_decimal *dst);
+void nullOutLongDecimal(s21_long_decimal *dst);
+
 void negateDecimal(s21_decimal *dst);
+
 bool isSetBit(s21_decimal number, int index);
 bool isSetLongBit(s21_long_decimal dst, int index);
+
 void setBit(s21_decimal *dst, int index);
-void inverseBit(s21_decimal *dst, int index);
-void resetBit(s21_decimal *dst, int index);
-int get_scale(s21_decimal num);
-bool isCorrectDecimal(s21_decimal *num);
-void nullOutLongDecimal(s21_long_decimal *dst);
 void setLongBit(s21_long_decimal *dst, int index);
+
+void inverseBit(s21_decimal *dst, int index);
+
+void resetBit(s21_decimal *dst, int index);
 void resetLongBit(s21_long_decimal *dst, int index);
+
+int getScale(s21_decimal num);
+void setScale(s21_decimal *num, int scale);
+bool isCorrectDecimal(s21_decimal *num);
+
+void alignScale(s21_decimal *value_1, s21_decimal *value_2, int *errorType);
+void multiplyBy10(s21_decimal *src, int *errorType);
+void shift_left(s21_decimal *src, int shift, int *errorType);
+
+bool isIntPartBigger(s21_decimal value_1, s21_decimal value_2);
+void copySign(s21_decimal value_1, s21_decimal *result);
 
 // convertation
 int s21_from_int_to_decimal(int src, s21_decimal *dst);
 int s21_from_decimal_to_int(s21_decimal src, int *dst);
 
 // arithmetics
-s21_long_decimal addition(s21_long_decimal a, s21_long_decimal b,
-                          s21_long_decimal *result);
+// s21_long_decimal addition(s21_long_decimal a, s21_long_decimal b,
+//                           s21_long_decimal *result);
+int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
+void addition(s21_decimal a, s21_decimal b, s21_decimal *result,
+              int *errorType);
+void subtraction(s21_decimal a, s21_decimal b, s21_decimal *result,
+                 int *errorType);
 
 #endif  // S21_DECIMAL_H
