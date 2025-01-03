@@ -100,12 +100,13 @@ void shift_left(s21_decimal *src, int shift, int *errorType) {
 }
 
 bool isIntPartBigger(s21_decimal value_1, s21_decimal value_2) {
-  bool result = false;
-  for (int i = ROW_NUMBER - 1; i >= 0; i--) {
-    if ((unsigned int)value_1.bits[i] > (unsigned int)value_2.bits[i]) {
-      result = true;
-      break;
-    }
+  bool result = true;
+  for (int bit_index = VALUE_PART_SIZE - 1;
+       (bit_index >= 0) && result &&
+       !(isSetBit(value_1, bit_index) && !isSetBit(value_2, bit_index));
+       bit_index--) {
+    if (!isSetBit(value_1, bit_index) && isSetBit(value_2, bit_index))
+      result = false;
   }
   return result;
 }
@@ -117,7 +118,8 @@ void copySign(s21_decimal value, s21_decimal *result) {
     resetBit(result, MINUS_BIT_INDEX);
 }
 
-// void longNormalization(s21_long_decimal *value_1, s21_long_decimal *value_2)
+// void longNormalization(s21_long_decimal *value_1, s21_long_decimal
+// *value_2)
 // {
 //   int scale_1 = big_getScale(*value_1);
 //   int scale_2 = big_getScale(*value_2);

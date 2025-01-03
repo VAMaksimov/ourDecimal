@@ -1,41 +1,63 @@
 #include "../s21_decimal.h"
 
-int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
-  return addWrapper(value_1, value_2, result, addition, subtraction);
-}
-
-int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
-  inverseBit(&value_2, MINUS_BIT_INDEX);
-  return addWrapper(value_1, value_2, result, addition, subtraction);
-}
-
-int addWrapper(s21_decimal value_1, s21_decimal value_2, s21_decimal *result,
-               void (*primaryFunction)(s21_decimal value_1, s21_decimal value_2,
-                                       s21_decimal *result, int *errorType),
-               void (*secondaryFunction)(s21_decimal value_1,
-                                         s21_decimal value_2,
-                                         s21_decimal *result, int *errorType)) {
+int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   if (result == NULL || !isCorrectDecimal(&value_1) ||
       !isCorrectDecimal(&value_2))
     return NUMBER_TOO_SMALL;
 
   int errorType = ADD_OK;
+  resetDecimal(result);
+
+  int bit_index = VALUE_PART_SIZE - 1;
+  while (!isSetBit(value_2, bit_index) && bit_index >= 0) bit_index--;
+
+  while (bit_index >= 0 && errorType == ADD_OK) {
+    shift_left(result, 1, &errorType);
+    if (isSetBit(value_2, bit_index))
+      addition(value_1, *result, result, &errorType);
+    bit_index--;
+  }
+
+  if (isSetBit(value_1, MINUS_BIT_INDEX) != isSetBit(value_2, MINUS_BIT_INDEX))
+    setBit(result, MINUS_BIT_INDEX);
+
+  return errorType;
+}
+
+int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+  return addWrapper(value_1, value_2, result);
+}
+
+int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+  inverseBit(&value_2, MINUS_BIT_INDEX);
+  return addWrapper(value_1, value_2, result);
+}
+
+int addWrapper(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+  if (result == NULL || !isCorrectDecimal(&value_1) ||
+      !isCorrectDecimal(&value_2))
+    return NUMBER_TOO_SMALL;
+
+  int errorType = ADD_OK;
+  nullOutDecimal(result);
 
   alignScale(&value_1, &value_2, &errorType);
 
   if (errorType == ADD_OK) {
     setScale(result, max(getScale(value_1), getScale(value_2)));
-
     if (isSetBit(value_1, MINUS_BIT_INDEX) ==
-        isSetBit(value_2, MINUS_BIT_INDEX))
-      primaryFunction(value_1, value_2, result, &errorType);
-    else
-      secondaryFunction(value_1, value_2, result, &errorType);
-
-    if (isIntPartBigger(value_1, value_2))
+        isSetBit(value_2, MINUS_BIT_INDEX)) {
+      addition(value_1, value_2, result, &errorType);
       copySign(value_1, result);
-    else
-      copySign(value_2, result);
+    } else {
+      if (isIntPartBigger(value_1, value_2)) {
+        subtraction(value_1, value_2, result, &errorType);
+        copySign(value_1, result);
+      } else {
+        subtraction(value_2, value_1, result, &errorType);
+        copySign(value_2, result);
+      }
+    }
   }
   if (errorType) resetDecimal(result);
   return errorType;
@@ -66,7 +88,6 @@ int addWrapper(s21_decimal value_1, s21_decimal value_2, s21_decimal *result,
 void addition(s21_decimal a, s21_decimal b, s21_decimal *result,
               int *errorType) {
   unsigned carry = 0;
-  nullOutDecimal(result);
 
   for (int bit_index = 0; bit_index < VALUE_PART_SIZE; bit_index++) {
     int bit1 = isSetBit(a, bit_index) ? 1 : 0;
@@ -116,7 +137,6 @@ void addition(s21_decimal a, s21_decimal b, s21_decimal *result,
 void subtraction(s21_decimal a, s21_decimal b, s21_decimal *result,
                  int *errorType) {
   unsigned borrow = 0;
-  nullOutDecimal(result);
 
   for (int bit_index = 0; bit_index < VALUE_PART_SIZE; bit_index++) {
     int bit1 = isSetBit(a, bit_index) ? 1 : 0;
