@@ -82,6 +82,14 @@ int s21_from_decimal_to_int(s21_decimal src, int *dst);
 // s21_long_decimal addition(s21_long_decimal a, s21_long_decimal b,
 //                           s21_long_decimal *result);
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
+int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
+
+int addWrapper(s21_decimal value_1, s21_decimal value_2, s21_decimal *result,
+               void (*primaryFunction)(s21_decimal value_1, s21_decimal value_2,
+                                       s21_decimal *result, int *errorType),
+               void (*secondaryFunction)(s21_decimal value_1,
+                                         s21_decimal value_2,
+                                         s21_decimal *result, int *errorType));
 void addition(s21_decimal a, s21_decimal b, s21_decimal *result,
               int *errorType);
 void subtraction(s21_decimal a, s21_decimal b, s21_decimal *result,
