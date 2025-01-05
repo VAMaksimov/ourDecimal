@@ -2,7 +2,11 @@
 
 void assertDecimal(s21_decimal expected, s21_decimal actual) {
   int row = ROW_NUMBER;
-  while (row--) ck_assert_int_eq(expected.bits[row], actual.bits[row]);
+  while (row--) {
+    if (expected.bits[row] != actual.bits[row])
+      printf("Error on row %d\n", row + 1);
+    ck_assert_int_eq(expected.bits[row], actual.bits[row]);
+  }
 }
 
 void assertLongDecimal(s21_long_decimal expected, s21_long_decimal actual) {

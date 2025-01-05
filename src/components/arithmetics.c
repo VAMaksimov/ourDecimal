@@ -1,5 +1,7 @@
 #include "../s21_decimal.h"
 
+int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {}
+
 int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   if (result == NULL || !isCorrectDecimal(&value_1) ||
       !isCorrectDecimal(&value_2))
@@ -13,13 +15,25 @@ int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
 
   while (bit_index >= 0 && errorType == ADD_OK) {
     shift_left(result, 1, &errorType);
-    if (isSetBit(value_2, bit_index))
+    if (isSetBit(value_2, bit_index)) {
       addition(value_1, *result, result, &errorType);
+    }
     bit_index--;
   }
 
-  if (isSetBit(value_1, MINUS_BIT_INDEX) != isSetBit(value_2, MINUS_BIT_INDEX))
+  if (isSetBit(value_1, MINUS_BIT_INDEX) !=
+      isSetBit(value_2, MINUS_BIT_INDEX)) {
     setBit(result, MINUS_BIT_INDEX);
+  }
+
+  if (errorType) {
+    errorType = isSetBit(*result, MINUS_BIT_INDEX) ? NUMBER_TOO_SMALL
+                                                   : NUMBER_TOO_LARGE;
+    resetDecimal(result);
+  } else {
+    int scale = getScale(value_1) + getScale(value_2);
+    setScale(result, scale);
+  }
 
   return errorType;
 }
@@ -103,6 +117,7 @@ void addition(s21_decimal a, s21_decimal b, s21_decimal *result,
 
     carry = sum / 2;
   }
+
   if (carry) {
     if (isSetBit(a, MINUS_BIT_INDEX))
       *errorType = NUMBER_TOO_SMALL;

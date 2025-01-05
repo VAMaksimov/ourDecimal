@@ -74,6 +74,8 @@ void shift_left(s21_decimal *src, int shift, int *errorType);
 bool isIntPartBigger(s21_decimal value_1, s21_decimal value_2);
 void copySign(s21_decimal value_1, s21_decimal *result);
 
+void printDecimal(s21_decimal value);
+
 // convertation
 int s21_from_int_to_decimal(int src, s21_decimal *dst);
 int s21_from_decimal_to_int(s21_decimal src, int *dst);

@@ -50,7 +50,12 @@ void resetLongBit(s21_long_decimal *dst, int index) {
 
 int getScale(s21_decimal num) { return (num.bits[3] << 1) >> 17; }
 
-void setScale(s21_decimal *num, int scale) { num->bits[3] = scale << 16; }
+void setScale(s21_decimal *num, int scale) {
+  if (isSetBit(*num, MINUS_BIT_INDEX))
+    num->bits[3] = (scale << 16) | (1 << getColumn(MINUS_BIT_INDEX));
+  else
+    num->bits[3] = (scale << 16);
+}
 
 bool isCorrectDecimal(s21_decimal *num) {
   return num != NULL && getScale(*num) <= 28 &&
@@ -116,6 +121,21 @@ void copySign(s21_decimal value, s21_decimal *result) {
     setBit(result, MINUS_BIT_INDEX);
   else
     resetBit(result, MINUS_BIT_INDEX);
+}
+
+void printDecimal(s21_decimal value) {
+  for (int i = 0; i < ROW_NUMBER; i++) {
+    printf(" value.bits[%d] = ", i);
+    for (int j = COLUMN_NUMBER - 1; j >= 0; j--) {
+      if (value.bits[i] & (1 << j)) {
+        printf("1");
+      } else {
+        printf("0");
+      }
+      if (j % 8 == 0) printf(" ");
+    }
+    printf("= %u = 0x%X\n", value.bits[i], value.bits[i]);
+  }
 }
 
 // void longNormalization(s21_long_decimal *value_1, s21_long_decimal
