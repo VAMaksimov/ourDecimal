@@ -62,6 +62,7 @@ void inverseBit(s21_decimal *dst, int index);
 
 void resetBit(s21_decimal *dst, int index);
 void resetLongBit(s21_long_decimal *dst, int index);
+bool isDecimalZero(s21_decimal num);
 
 int getScale(s21_decimal num);
 void setScale(s21_decimal *num, int scale);
@@ -71,8 +72,9 @@ void alignScale(s21_decimal *value_1, s21_decimal *value_2, int *errorType);
 void multiplyBy10(s21_decimal *src, int *errorType);
 void shift_left(s21_decimal *src, int shift, int *errorType);
 
-bool isIntPartBigger(s21_decimal value_1, s21_decimal value_2);
+bool isIntPartBiggerOrEqual(s21_decimal value_1, s21_decimal value_2);
 void copySign(s21_decimal value_1, s21_decimal *result);
+int determineTheSizeDifference(s21_decimal value_1, s21_decimal value_2);
 
 void printDecimal(s21_decimal value);
 

@@ -1,6 +1,35 @@
 #include "../s21_decimal.h"
 
-int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {}
+int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+  if (result == NULL || !isCorrectDecimal(&value_1) ||
+      !isCorrectDecimal(&value_2))
+    return NUMBER_TOO_SMALL;
+  if (isDecimalZero(value_2)) return DIVISION_BY_ZERO;
+
+  int errorType = ADD_OK;
+  resetDecimal(result);
+
+  alignScale(&value_1, &value_2, &errorType);
+  s21_decimal remainder = value_1;
+
+  if (errorType == ADD_OK) {
+    setScale(result, max(getScale(value_1), getScale(value_2)));
+    while (!isDecimalZero(remainder) && errorType == ADD_OK) {
+      multiplyBy10(result, &errorType);
+      while (isIntPartBiggerOrEqual(remainder, value_2)) {
+        s21_decimal spare_value = value_2;
+        int difference = determineTheSizeDifference(remainder, value_2);
+        shift_left(&spare_value, difference, &errorType);
+        subtraction(remainder, spare_value, &remainder, &errorType);
+        nullOutDecimal(&spare_value);
+        setBit(&spare_value, VALUE_PART_SIZE - 1);
+        shift_left(&spare_value, difference, &errorType);
+        addition(*result, spare_value, result, &errorType);
+      }
+      multiplyBy10(&remainder, &errorType);
+    }
+  }
+}
 
 int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   if (result == NULL || !isCorrectDecimal(&value_1) ||
@@ -64,7 +93,7 @@ int addWrapper(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
       addition(value_1, value_2, result, &errorType);
       copySign(value_1, result);
     } else {
-      if (isIntPartBigger(value_1, value_2)) {
+      if (isIntPartBiggerOrEqual(value_1, value_2)) {
         subtraction(value_1, value_2, result, &errorType);
         copySign(value_1, result);
       } else {

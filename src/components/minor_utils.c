@@ -48,6 +48,11 @@ void resetLongBit(s21_long_decimal *dst, int index) {
   dst->bits[getRow(index)] &= ~((1 << getColumn(index)));
 }
 
+bool isDecimalZero(s21_decimal num) {
+  return num.bits[0] == 0 && num.bits[1] == 0 && num.bits[2] == 0 &&
+         num.bits[3] == 0;
+}
+
 int getScale(s21_decimal num) { return (num.bits[3] << 1) >> 17; }
 
 void setScale(s21_decimal *num, int scale) {
@@ -104,7 +109,7 @@ void shift_left(s21_decimal *src, int shift, int *errorType) {
   }
 }
 
-bool isIntPartBigger(s21_decimal value_1, s21_decimal value_2) {
+bool isIntPartBiggerOrEqual(s21_decimal value_1, s21_decimal value_2) {
   bool result = true;
   for (int bit_index = VALUE_PART_SIZE - 1;
        (bit_index >= 0) && result &&
@@ -121,6 +126,16 @@ void copySign(s21_decimal value, s21_decimal *result) {
     setBit(result, MINUS_BIT_INDEX);
   else
     resetBit(result, MINUS_BIT_INDEX);
+}
+
+int determineTheSizeDifference(s21_decimal value_1, s21_decimal value_2) {
+  int bit_index = VALUE_PART_SIZE - 1, difference = 0;
+  while (!isSetBit(value_1, bit_index) && bit_index >= 0) bit_index--;
+  while (!isSetBit(value_2, bit_index) && bit_index >= 0)
+    difference++, bit_index--;
+  if (!isIntPartBiggerOrEqual(value_2, value_1)) difference--;
+
+  return difference;
 }
 
 void printDecimal(s21_decimal value) {
