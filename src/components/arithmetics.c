@@ -44,15 +44,9 @@ int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
 
   while (bit_index >= 0 && errorType == ADD_OK) {
     shift_left(result, 1, &errorType);
-    if (isSetBit(value_2, bit_index)) {
+    if (isSetBit(value_2, bit_index))
       addition(value_1, *result, result, &errorType);
-    }
     bit_index--;
-  }
-
-  if (isSetBit(value_1, MINUS_BIT_INDEX) !=
-      isSetBit(value_2, MINUS_BIT_INDEX)) {
-    setBit(result, MINUS_BIT_INDEX);
   }
 
   if (errorType) {
@@ -60,8 +54,11 @@ int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
                                                    : NUMBER_TOO_LARGE;
     resetDecimal(result);
   } else {
-    int scale = getScale(value_1) + getScale(value_2);
-    setScale(result, scale);
+    setScale(result, getScale(value_1) + getScale(value_2));
+    if (isSetBit(value_1, MINUS_BIT_INDEX) !=
+        isSetBit(value_2, MINUS_BIT_INDEX)) {
+      setBit(result, MINUS_BIT_INDEX);
+    }
   }
 
   return errorType;
