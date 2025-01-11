@@ -3,20 +3,20 @@
 int s21_is_greater(s21_decimal a, s21_decimal b, int *errorType) {
   if (errorType == NULL) return false;
 
-  bool signA = isSetBit(a, MINUS_BIT_INDEX);
-  bool signB = isSetBit(b, MINUS_BIT_INDEX);
+  bool negativeA = isSetBit(a, MINUS_BIT_INDEX);
+  bool negativeB = isSetBit(b, MINUS_BIT_INDEX);
 
-  if (!signA && signB) return true;
-  if (signA && !signB) return false;
+  if (!negativeA && negativeB) return true;
+  if (negativeA && !negativeB) return false;
 
   alignScale(&a, &b, errorType);
   if (*errorType) return false;
 
   for (int i = ROW_NUMBER - 1; i >= 0; i--) {
     if (a.bits[i] > b.bits[i])
-      return !signA;
+      return !negativeA;
     else if (a.bits[i] < b.bits[i])
-      return signA;
+      return negativeA;
   }
   return false;
 }
@@ -24,19 +24,19 @@ int s21_is_greater(s21_decimal a, s21_decimal b, int *errorType) {
 int s21_is_less(s21_decimal a, s21_decimal b, int *errorType) {
   if (errorType == NULL) return false;
 
-  bool signA = isSetBit(a, MINUS_BIT_INDEX);
-  bool signB = isSetBit(b, MINUS_BIT_INDEX);
+  bool negativeA = isSetBit(a, MINUS_BIT_INDEX);
+  bool negativeB = isSetBit(b, MINUS_BIT_INDEX);
 
-  if (signA && !signB) return true;
-  if (!signA && signB) return false;
+  if (negativeA && !negativeB) return true;
+  if (!negativeA && negativeB) return false;
 
   alignScale(&a, &b, errorType);
 
   for (int i = ROW_NUMBER - 1; i >= 0; i--) {
     if (a.bits[i] < b.bits[i])
-      return !signA;
+      return !negativeA;
     else if (a.bits[i] > b.bits[i])
-      return signA;
+      return negativeA;
   }
   return false;
 }
@@ -44,10 +44,10 @@ int s21_is_less(s21_decimal a, s21_decimal b, int *errorType) {
 int s21_is_equal(s21_decimal a, s21_decimal b, int *errorType) {
   if (errorType == NULL) return false;
 
-  bool signA = isSetBit(a, MINUS_BIT_INDEX);
-  bool signB = isSetBit(b, MINUS_BIT_INDEX);
+  bool negativeA = isSetBit(a, MINUS_BIT_INDEX);
+  bool negativeB = isSetBit(b, MINUS_BIT_INDEX);
 
-  if (signA != signB) return false;
+  if (negativeA != negativeB) return false;
 
   alignScale(&a, &b, errorType);
   if (*errorType) return false;
@@ -62,10 +62,10 @@ int s21_is_equal(s21_decimal a, s21_decimal b, int *errorType) {
 int s21_is_not_equal(s21_decimal a, s21_decimal b, int *errorType) {
   if (errorType == NULL) return false;
 
-  bool signA = isSetBit(a, MINUS_BIT_INDEX);
-  bool signB = isSetBit(b, MINUS_BIT_INDEX);
+  bool negativeA = isSetBit(a, MINUS_BIT_INDEX);
+  bool negativeB = isSetBit(b, MINUS_BIT_INDEX);
 
-  if (signA != signB) return true;
+  if (negativeA != negativeB) return true;
 
   alignScale(&a, &b, errorType);
   if (*errorType) return false;
