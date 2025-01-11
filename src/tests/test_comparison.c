@@ -63,7 +63,7 @@ s21_decimal lhs[] = {
     {{0x000046CB, 0x00000000, 0x00000000, 0x00030000}},  // 18.123
     {{0x000046CA, 0x00000000, 0x00000000, 0x00030000}},  // 18.122
     {{0x000046CC, 0x00000000, 0x00000000, 0x00030000}},  // 18.124
-    {{0x00000000, 0x00000000, 0x00000000, 0x80030000}},  // 0.000
+    {{0x00000000, 0x00000000, 0x00000000, 0x80030000}},  // -0.000
     {{0x00003C28, 0x00000000, 0x00000000, 0x80020000}},  // -154.00
     {{0x0000009A, 0x00000000, 0x00000000, 0x00000000}},  // 154
     {{0x00003C28, 0x0000000D, 0x0000000B,
@@ -132,7 +132,7 @@ s21_decimal rhs[] = {
     {{0x000042E3, 0x00000000, 0x00000000, 0x00030000}},  // 17.123
     {{0x000042E3, 0x00000000, 0x00000000, 0x00030000}},  // 17.123
     {{0x000042E3, 0x00000000, 0x00000000, 0x00030000}},  // 17.123
-    {{0x00000000, 0x00000000, 0x00000000, 0x00040000}},  // 0.0000
+    {{0x00000000, 0x00000000, 0x00000000, 0x00040000}},  // +0.0000
     {{0x0000009A, 0x00000000, 0x00000000, 0x80000000}},  // -154
     {{0x00003C28, 0x00000000, 0x00000000, 0x00020000}},  // 154.00
     {{0x0000009A, 0x0000000D, 0x0000000B,
@@ -147,16 +147,16 @@ int resultForIsGreater[] = {
     0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1,
 };
 
-int resultForIsEqual[] = {
-    1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0,
-    0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
-    1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
+int resultForIsLess[] = {
+    0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0,
+    0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1,
+    0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0,
 };
 
 int resultForIsGreaterOrEqual[] = {
-    1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1,
+    1, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1,
     1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0,
-    1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1,
+    1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1,
 };
 
 int resultForIsLessOrEqual[] = {
@@ -165,33 +165,34 @@ int resultForIsLessOrEqual[] = {
     1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0,
 };
 
-int resultForIsLess[] = {
-    0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1,
-    0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0,
-    0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0,
+int resultForIsEqual[] = {
+    1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0,
+    0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+    1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0,
 };
 
 int resultForIsNotEqual[] = {
-    0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
+    0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
     1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
-    0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1,
+    0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1,
 };
 
 START_TEST(isGreater) {
   for (size_t i = 0; i < sizeof(lhs) / sizeof(s21_decimal); ++i) {
     int actual = s21_is_greater(lhs[i], rhs[i]),
         expected = resultForIsGreater[i];
-    if (actual != expected) printf("Error on pair %ld\n", i + 1);
+    if (actual != expected)
+      printf("s21_is_greater: Error on pair %ld\n", i + 1);
     ck_assert_int_eq(actual, expected);
   }
 }
 END_TEST
 
-START_TEST(isEqual) {
+START_TEST(isLess) {
   for (size_t i = 0; i < sizeof(lhs) / sizeof(s21_decimal); ++i) {
-    int actual = s21_is_equal(lhs[i], rhs[i]), expected = resultForIsEqual[i];
-    if (actual != expected) printf("Error on pair %ld\n", i + 1);
-    ck_assert_int_eq(actual, expected);
+    int actual = s21_is_less(lhs[i], rhs[i]), expected = resultForIsLess[i];
+    if (actual != expected) printf("s21_is_less: Error on pair %ld\n", i + 1);
+    ck_assert_int_eq(actual, resultForIsLess[i]);
   }
 }
 END_TEST
@@ -200,7 +201,8 @@ START_TEST(IsGreaterOrEqual) {
   for (size_t i = 0; i < sizeof(lhs) / sizeof(s21_decimal); ++i) {
     int actual = s21_is_greater_or_equal(lhs[i], rhs[i]),
         expected = resultForIsGreaterOrEqual[i];
-    if (actual != expected) printf("Error on pair %ld\n", i + 1);
+    if (actual != expected)
+      printf("s21_is_greater_or_equal: Error on pair %ld\n", i + 1);
     ck_assert_int_eq(actual, expected);
   }
 }
@@ -210,17 +212,18 @@ START_TEST(isLessOrEqual) {
   for (size_t i = 0; i < sizeof(lhs) / sizeof(s21_decimal); ++i) {
     int actual = s21_is_less_or_equal(lhs[i], rhs[i]),
         expected = resultForIsLessOrEqual[i];
-    if (actual != expected) printf("Error on pair %ld\n", i + 1);
+    if (actual != expected)
+      printf("s21_is_less_or_equal: Error on pair %ld\n", i + 1);
     ck_assert_int_eq(actual, resultForIsLessOrEqual[i]);
   }
 }
 END_TEST
 
-START_TEST(isLess) {
+START_TEST(isEqual) {
   for (size_t i = 0; i < sizeof(lhs) / sizeof(s21_decimal); ++i) {
-    int actual = s21_is_less(lhs[i], rhs[i]), expected = resultForIsLess[i];
-    if (actual != expected) printf("Error on pair %ld\n", i + 1);
-    ck_assert_int_eq(actual, resultForIsLess[i]);
+    int actual = s21_is_equal(lhs[i], rhs[i]), expected = resultForIsEqual[i];
+    if (actual != expected) printf("s21_is_equal: Error on pair %ld\n", i + 1);
+    ck_assert_int_eq(actual, expected);
   }
 }
 END_TEST
@@ -229,22 +232,23 @@ START_TEST(isNotEqual) {
   for (size_t i = 0; i < sizeof(lhs) / sizeof(s21_decimal); ++i) {
     int actual = s21_is_not_equal(lhs[i], rhs[i]),
         expected = resultForIsNotEqual[i];
-    if (actual != expected) printf("Error on pair %ld\n", i + 1);
+    if (actual != expected)
+      printf("s21_is_not_equal: Error on pair %ld\n", i + 1);
     ck_assert_int_eq(actual, resultForIsNotEqual[i]);
   }
 }
 END_TEST
 
 Suite *comparison_suite(void) {
-  Suite *s = suite_create("s21_is_greater");
-  TCase *tc = tcase_create("s21_is_greater");
+  Suite *s = suite_create("comparison_suite");
+  TCase *tc = tcase_create("comparison_suite");
 
   if (s != NULL && tc != NULL) {
     tcase_add_test(tc, isGreater);
-    tcase_add_test(tc, isEqual);
+    tcase_add_test(tc, isLess);
     tcase_add_test(tc, IsGreaterOrEqual);
     tcase_add_test(tc, isLessOrEqual);
-    tcase_add_test(tc, isLess);
+    tcase_add_test(tc, isEqual);
     tcase_add_test(tc, isNotEqual);
     suite_add_tcase(s, tc);
   }
