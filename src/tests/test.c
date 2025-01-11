@@ -16,7 +16,8 @@ void assertLongDecimal(s21_long_decimal expected, s21_long_decimal actual) {
 
 int main(void) {
   int fails_count = 0;
-  Suite *suite_list[] = {convert_suite(), arithmetic_suite(), NULL};
+  Suite *suite_list[] = {convert_suite(), arithmetic_suite(),
+                         comparison_suite(), NULL};
 
   for (Suite **current_suite = suite_list; *current_suite != NULL;
        current_suite++) {
