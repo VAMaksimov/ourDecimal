@@ -97,15 +97,14 @@ void shift_left(s21_decimal *src, int shift, int *errorType) {
   while (shift--) {
     if (isSetBit(*src, VALUE_PART_SIZE - 1)) {
       *errorType = NUMBER_TOO_LARGE;
-    } else {
-      for (int bit_index = VALUE_PART_SIZE - 1; bit_index > 0; bit_index--) {
-        if (isSetBit(*src, bit_index - 1)) {
-          setBit(src, bit_index);
-          resetBit(src, bit_index - 1);
-        }
-      }
-      resetBit(src, 0);
     }
+    for (int bit_index = VALUE_PART_SIZE - 1; bit_index > 0; bit_index--) {
+      if (isSetBit(*src, bit_index - 1)) {
+        setBit(src, bit_index);
+        resetBit(src, bit_index - 1);
+      }
+    }
+    resetBit(src, 0);
   }
 }
 

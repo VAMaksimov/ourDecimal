@@ -534,7 +534,7 @@ START_TEST(mul_border_1) {
               subject2 = {{2, 0, 0, __DECIMAL_NEGATIVE_INT_INFO__}};
   s21_decimal actual = {0}, expected = {0};
   performMultiplication(subject1, subject2, expected, &actual,
-                        NUMBER_TOO_SMALL);
+                        NUMBER_TOO_LARGE);
 }
 END_TEST
 
