@@ -1,7 +1,10 @@
 #ifndef S21_DECIMAL_H
 #define S21_DECIMAL_H
 
+#include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define bool _Bool
 #define true 1
@@ -54,7 +57,7 @@ void negateDecimal(s21_decimal *dst);
 
 bool isSetBit(s21_decimal number, int index);
 bool isSetLongBit(s21_long_decimal dst, int index);
-
+bool isScaleSet(s21_decimal dst);
 void setBit(s21_decimal *dst, int index);
 void setLongBit(s21_long_decimal *dst, int index);
 
@@ -77,8 +80,11 @@ void copySign(s21_decimal value_1, s21_decimal *result);
 int determineTheSizeDifference(s21_decimal value_1, s21_decimal value_2);
 
 void printDecimal(s21_decimal value);
-
+void div_10(s21_decimal *value);
+int s21_truncate(s21_decimal value, s21_decimal *result);
 // convertation
+
+int getFloatExponent(char *value);
 int s21_from_int_to_decimal(int src, s21_decimal *dst);
 int s21_from_decimal_to_int(s21_decimal src, int *dst);
 
@@ -94,5 +100,4 @@ void addition(s21_decimal a, s21_decimal b, s21_decimal *result,
               int *errorType);
 void subtraction(s21_decimal a, s21_decimal b, s21_decimal *result,
                  int *errorType);
-
 #endif  // S21_DECIMAL_H
