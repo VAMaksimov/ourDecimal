@@ -23,6 +23,7 @@ void negateDecimal(s21_decimal *dst) {
 bool isSetBit(s21_decimal dst, int index) {
   return (dst.bits[getRow(index)] & (1 << getColumn(index)));
 }
+bool isScaleSet(s21_decimal dst) { return (dst.bits[3] & 0x00FF0000); }
 
 bool isSetLongBit(s21_long_decimal dst, int index) {
   return (dst.bits[getRow(index)] & (1 << getColumn(index)));
@@ -171,17 +172,27 @@ void printDecimal(s21_decimal value) {
 //     }
 //   }
 // }
+void div_10(s21_decimal *value) {
+  for (int i = 0; i < 3; i++) {
+    value->bits[i] /= 10;
+  }
+}
 
-// bool s21_truncate(s21_decimal *value) {
-//   if (result == NULL || !correct_decimal(&value)) return 1;
-//   for (int i = 0; i < 3; i++) result->bits[i] = value.bits[i];
-//   int exp = getScale(value);
-//   int sign = get_sign(value);
-//   while (exp > 0) {
-//     div_10(result);
-//     exp--;
-//   }
-//   set_scale(result, 0);
-//   set_sign(result, sign);
-//   return 0;
-// }
+int s21_truncate(s21_decimal value, s21_decimal *result) {
+  if (result == NULL || !correct_decimal(&value)) return 1;
+  for (int i = 0; i < 3; i++) result->bits[i] = value.bits[i];
+  int exp = getScale(value);
+  while (exp > 0) {
+    div_10(result);
+    exp--;
+  }
+  setScale(result, 0);
+  return result;
+}
+
+int getFloatExponent(char *value)
+
+{
+  char *pointer = strchr(value, 'E');
+  return atoi(pointer + 1);
+}
