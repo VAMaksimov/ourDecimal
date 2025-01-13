@@ -86,6 +86,8 @@ int s21_from_decimal_to_int(s21_decimal src, int *dst);
 // s21_long_decimal addition(s21_long_decimal a, s21_long_decimal b,
 //                           s21_long_decimal *result);
 int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
+int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
+int shift_left_combined(s21_decimal A, s21_decimal Q, int shift);
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 
@@ -102,5 +104,11 @@ int s21_is_equal(s21_decimal a, s21_decimal b);
 int s21_is_not_equal(s21_decimal a, s21_decimal b);
 int s21_is_greater_or_equal(s21_decimal a, s21_decimal b);
 int s21_is_less_or_equal(s21_decimal a, s21_decimal b);
+
+//others
+int s21_truncate(s21_decimal value, s21_decimal *result);
+int s21_floor(s21_decimal value, s21_decimal *result);
+int s21_round(s21_decimal value, s21_decimal *result);
+int s21_negate(s21_decimal value, s21_decimal *result);
 
 #endif  // S21_DECIMAL_H
