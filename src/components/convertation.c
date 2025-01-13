@@ -70,54 +70,62 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
   scale = scale - exp;
   if (scale < 0 || scale > 28) return CONVERTATION_ERROR;
 
-  int lenght = strlen(int_str);
-  int part_index = 0;
-  int parts[3] = {0};
+  // int lenght = strlen(int_str);
+  // int part_index = 0;
+  // int parts[3] = {0};
 
-  while (lenght > 0 && part_index <= 2) {
-    int start = (lenght > 10) ? (lenght - 10) : 0;
-    char part_str[11] = {0};
-    strncpy(part_str, &int_str[start], lenght - start);
-    parts[part_index] = atoi(part_str);
-    part_index++;
-    lenght -= 10;
-  }
-  dst->bits[0] = parts[0];
-  dst->bits[1] = parts[1];
-  dst->bits[2] = parts[2];
+  // while (lenght > 0 &&
+  //   part_index <= 2) {  // тут я забыл что число сокращается до 7 символов
+  // и предусмотрел разделение числа в чаре до 10
+  // цифр чтобы вместилось в бит ( 32 бита) возможно пригодится для big decimal
+  // или можно будет потом убрать
+  // int start = (lenght > 10) ? (lenght - 10) : 0;
+  // char part_str[11] = {0};
+  // strncpy(part_str, &int_str[start], lenght - start);
+  // parts[part_index] = atoi(part_str);
+  // part_index++;
+  // lenght -= 10;
+  // }
 
+  //       dst->bits[0] = parts[0];
+  //      dst->bits[1] = parts[1];
+  //    dst->bits[2] = parts[2];
+  dst->bits[0] = atoi(int_str);
   setScale(dst, scale);
 
   return CONVERTATION_SUCCESS;
 }
 
 int s21_from_decimal_to_float(s21_decimal src, float *dst) {
-  if (!dst) {
+  if (dst == NULL || src.bits[1] || src.bits[2] ||
+      isSetBit(src, ADDITIONAL_INT_BIT) || !isCorrectDecimal(&src))
     return CONVERTATION_ERROR;
-  }
+
   if (fabs(*dst) > 0 && fabs(*dst) < 1e-28) {
     return CONVERTATION_ERROR;
   }
   if (fabs(*dst) > 7.9228162514264337593543950335e+28 || isinf(*dst)) {
     return CONVERTATION_ERROR;
   }
-  int scale = getScale(src);
-  int num[3] = {0};
-
-  for (int i = 0; i < 3; i++) {
-    num[i] = src.bits[i];
+  long double a = 0;
+  s21_decimal res = {0};
+  s21_truncate(src, &res);
+  int sign;
+  for (int i = 0; i < 96; i++) {
+    sign = (int)isSetBit(res, i);
+    a += sign * pow(2, i);
   }
-  float result = 0.0;
-  result += (long long)num[0];
-  result += (long long)num[1] << 32;
-  result += (long long)num[2] << 32;
-
-  for (int i = 0; i < scale; i++) {
-    result /= 10.0;
+  s21_decimal float_part = {0};
+  s21_sub(src, res, &float_part);
+  int scale = get_scale(src);
+  long double f_part = 0;
+  for (int i = 0; i < 96; i++) {
+    sign = (int)isSetBit(float_part, i);
+    f_part += sign * pow(2, i);
   }
+  *dst = (float)(f_part / pow(10, scale) + a);
   if (isSetBit(src, MINUS_BIT_INDEX)) {
-    result = -result;
+    *dst = -(*dst);
   }
-  *dst = result;
   return CONVERTATION_SUCCESS;
 }
