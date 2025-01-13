@@ -1,35 +1,120 @@
 #include "../s21_decimal.h"
 
+// int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+//   if (result == NULL || !isCorrectDecimal(&value_1) ||
+//       !isCorrectDecimal(&value_2))
+//     return NUMBER_TOO_SMALL;
+//   if (isDecimalZero(value_2)) return DIVISION_BY_ZERO;
+
+//   int errorType = ADD_OK;
+//   resetDecimal(result);
+
+//   alignScale(&value_1, &value_2, &errorType);
+//   s21_decimal remainder = value_1;
+
+//   if (errorType == ADD_OK) {
+//     int scale = -1;
+//     do {
+//       multiplyBy10(result, &errorType);
+//       while (isIntPartBiggerOrEqual(remainder, value_2)) {
+//         s21_decimal spare_value = value_2;
+//         int difference = determineTheSizeDifference(remainder, value_2);
+//         shift_left(&spare_value, difference, &errorType);
+//         subtraction(remainder, spare_value, &remainder, &errorType);
+//         nullOutDecimal(&spare_value);
+//         setBit(&spare_value, 0);
+//         shift_left(&spare_value, difference, &errorType);
+//         addition(*result, spare_value, result, &errorType);
+//       }
+//       multiplyBy10(&remainder, &errorType);
+//       scale++;
+//     } while (!isDecimalZero(remainder) && errorType == ADD_OK);
+
+//     if (isSetBit(value_1, MINUS_BIT_INDEX) !=
+//         isSetBit(value_2, MINUS_BIT_INDEX)) {
+//       setBit(result, MINUS_BIT_INDEX);
+//     }
+//     setScale(result, scale);
+//   }
+//   return errorType;
+// }
+
 int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   if (result == NULL || !isCorrectDecimal(&value_1) ||
-      !isCorrectDecimal(&value_2))
-    return NUMBER_TOO_SMALL;
-  if (isDecimalZero(value_2)) return DIVISION_BY_ZERO;
+      !isCorrectDecimal(&value_2)) {
+    return NUMBER_TOO_SMALL;  // Ошибка: некорректные входные данные
+  }
+  if (isDecimalZero(value_2)) {
+    resetDecimal(result);     // Обнуляем результат
+    return DIVISION_BY_ZERO;  // Ошибка: деление на ноль
+  }
 
-  int errorType = ADD_OK;
-  resetDecimal(result);
+  int errorType = ADD_OK;   // Флаг ошибки
+  s21_decimal A = {0};      // Регистр A (остаток)
+  s21_decimal Q = value_1;  // Регистр Q (делимое)
+  s21_decimal M = value_2;  // Регистр M (делитель)
+  int n = 32;  // Количество бит в делимом
 
-  alignScale(&value_1, &value_2, &errorType);
-  s21_decimal remainder = value_1;
+  resetDecimal(result);  // Инициализация результата
+
+  // Определение знака результата
+  int signResult = 0;  // 0 - положительный, 1 - отрицательный
+  if (isSetBit(value_1, MINUS_BIT_INDEX) !=
+      isSetBit(value_2, MINUS_BIT_INDEX)) {
+    signResult = 1;  // Знаки разные, результат будет отрицательным
+  }
+
+  // Работа с абсолютными значениями
+  resetBit(&Q, MINUS_BIT_INDEX);  // Убираем знак у делимого
+  resetBit(&M, MINUS_BIT_INDEX);  // Убираем знак у делителя
 
   if (errorType == ADD_OK) {
-    setScale(result, max(getScale(value_1), getScale(value_2)));
-    while (!isDecimalZero(remainder) && errorType == ADD_OK) {
-      multiplyBy10(result, &errorType);
-      while (isIntPartBiggerOrEqual(remainder, value_2)) {
-        s21_decimal spare_value = value_2;
-        int difference = determineTheSizeDifference(remainder, value_2);
-        shift_left(&spare_value, difference, &errorType);
-        subtraction(remainder, spare_value, &remainder, &errorType);
-        nullOutDecimal(&spare_value);
-        setBit(&spare_value, VALUE_PART_SIZE - 1);
-        shift_left(&spare_value, difference, &errorType);
-        addition(*result, spare_value, result, &errorType);
+    while (n > 0) {
+      // Шаг 2: Сдвиг влево A и Q как единое целое
+      shift_left_combined(A, Q, 1);
+
+      // Шаг 3: Вычитание M из A
+      s21_decimal tempA = A;  // Сохраняем текущее значение A
+      s21_sub(A, M, &A);  // A = A - M
+
+      // Шаг 4: Проверка старшего бита A
+      if (isSetBit(A, 31)) {  // Если старший бит A равен 1
+                              // (результат отрицательный)
+        resetBit(&Q, 0);  // Сбрасываем младший бит Q в 0
+        A = tempA;        // Восстанавливаем значение A
+      } else {
+        setBit(&Q, 0);  // Устанавливаем младший бит Q в 1
       }
-      multiplyBy10(&remainder, &errorType);
+
+      n--;  // Шаг 5: Уменьшение счетчика
+    }
+
+    *result = Q;  // Результат (частное)
+
+    // Установка знака результата
+    if (signResult) {
+      setBit(result, MINUS_BIT_INDEX);  // Устанавливаем знаковый бит
     }
   }
   return errorType;
+}
+
+int shift_left_combined(s21_decimal A, s21_decimal Q, int shift) {
+  int carry = 0;
+  for (int i = 0; i < shift; i++) {
+    // Сдвигаем A влево
+    carry = isSetBit(A, 31);  // Сохраняем старший бит A
+    shift_left(&A, 1, NULL);
+
+    // Сдвигаем Q влево и передаем carry в младший бит A
+    int q_carry = isSetBit(Q, 31);  // Сохраняем старший бит Q
+    shift_left(&Q, 1, NULL);
+    if (carry) {
+      setBit(&A, 0);  // Устанавливаем младший бит A
+    }
+    carry = q_carry;  // Обновляем carry для следующего сдвига
+  }
+  return carry;
 }
 
 int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
