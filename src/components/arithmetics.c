@@ -29,7 +29,7 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
       multiplyBy10(&remainder, &errorType);
     }
   }
-}
+  return errorType;
 
 int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   if (result == NULL || !isCorrectDecimal(&value_1) ||
