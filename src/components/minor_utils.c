@@ -54,13 +54,17 @@ bool isDecimalZero(s21_decimal num) {
          num.bits[3] == 0;
 }
 
-int getScale(s21_decimal num) { return (num.bits[3] << 1) >> 17; }
+int getScale(s21_decimal value) {
+  int result = (char)(value.bits[3] >> 16);
+  return result;
+}
 
 void setScale(s21_decimal *num, int scale) {
-  if (isSetBit(*num, MINUS_BIT_INDEX))
-    num->bits[3] = (scale << 16) | (1 << getColumn(MINUS_BIT_INDEX));
-  else
-    num->bits[3] = (scale << 16);
+  // Очистим bits[3], чтобы не было "мусора"
+  num->bits[3] = 0;
+
+  // Установим масштаб (scale), сдвигая на 16 позиций
+  num->bits[3] |= (scale << 16);
 }
 
 bool isCorrectDecimal(s21_decimal *num) {
@@ -179,7 +183,7 @@ void div_10(s21_decimal *value) {
 }
 
 int s21_truncate(s21_decimal value, s21_decimal *result) {
-  if (result == NULL || !correct_decimal(&value)) return 1;
+  if (result == NULL || !isCorrectDecimal(&value)) return 1;
   for (int i = 0; i < 3; i++) result->bits[i] = value.bits[i];
   int exp = getScale(value);
   while (exp > 0) {
@@ -187,12 +191,21 @@ int s21_truncate(s21_decimal value, s21_decimal *result) {
     exp--;
   }
   setScale(result, 0);
-  return result;
+  return 0;
 }
 
-int getFloatExponent(char *value)
+int getFloatExp(float *value) {
+  return ((*((int *)value) & ~(1 << 31)) >> 23) - 127;
+}
 
-{
-  char *pointer = strchr(value, 'E');
-  return atoi(pointer + 1);
+s21_decimal *setBitFloat(s21_decimal *value, int pos, int bit) {
+  if (pos / 32 < 4 && bit)
+    value->bits[pos / 32] |= (1 << (pos % 32));
+  else if (pos / 32 < 4 && !bit)
+    value->bits[pos / 32] &= ~(1 << (pos % 32));
+  return value;
+}
+void setNegativeSign(s21_decimal *value, int bit) {
+  value->bits[3] =
+      (bit) ? (value->bits[3] | (1u << 31)) : (value->bits[3] & ~(1 << 31));
 }

@@ -47,85 +47,63 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
   if (abs(src) > 7.9228162514264337593543950335e+28 || isinf(src)) {
     return CONVERTATION_ERROR;
   }
+  int exp = getFloatExp(&src);
+  resetDecimal(dst);
+  int sign = 0;
   if (src < 0) {
-    setBit(dst, MINUS_BIT_INDEX);
+    src *= -1;
+    sign = 1;
+    setNegativeSign(dst, 1);
   }
-  nullOutDecimal(dst);
-
-  char float_str[64];
-  sprintf(float_str, "%.7E", fabsf(src));
-
-  int exp = getFloatExponent(float_str);
-
-  char int_str[64] = {0};
+  double tmp = (double)src;
   int scale = 0;
-  int stop = 0;
-  for (char *p = float_str; *p != 'E'; p++) {
-    if (*p != '.') {
-      strncat(int_str, p, 1);
-    } else {
-      scale = strlen(p + 1);
+  while (scale < 28 && (int)tmp / (int)pow(2, 21) == 0) {
+    tmp *= 10;
+    scale++;
+  }
+
+  if (scale <= 28 && (exp > -94 && exp < 96)) {
+    fbits mant;
+    tmp = (float)tmp;
+    for (; fmod(tmp, 10) == 0 && scale > 0; scale--, tmp /= 10) {
+    }
+    mant.fl = tmp;
+    exp = getFloatExp(&mant.fl);
+    setBitFloat(dst, exp, 1);
+    for (int i = exp - 1, j = 22; j >= 0; i--, j--) {
+      if ((mant.ui & (1 << j)) != 0) {
+        setBitFloat(dst, i, 1);
+      }
+    }
+
+    setScale(dst, scale);
+    if (sign) {
+      setNegativeSign(dst, 1);
     }
   }
-  scale = scale - exp;
-  if (scale < 0 || scale > 28) return CONVERTATION_ERROR;
-
-  // int lenght = strlen(int_str);
-  // int part_index = 0;
-  // int parts[3] = {0};
-
-  // while (lenght > 0 &&
-  //   part_index <= 2) {  // тут я забыл что число сокращается до 7 символов
-  // и предусмотрел разделение числа в чаре до 10
-  // цифр чтобы вместилось в бит ( 32 бита) возможно пригодится для big decimal
-  // или можно будет потом убрать
-  // int start = (lenght > 10) ? (lenght - 10) : 0;
-  // char part_str[11] = {0};
-  // strncpy(part_str, &int_str[start], lenght - start);
-  // parts[part_index] = atoi(part_str);
-  // part_index++;
-  // lenght -= 10;
-  // }
-
-  //       dst->bits[0] = parts[0];
-  //      dst->bits[1] = parts[1];
-  //    dst->bits[2] = parts[2];
-  dst->bits[0] = atoi(int_str);
-  setScale(dst, scale);
 
   return CONVERTATION_SUCCESS;
 }
 
 int s21_from_decimal_to_float(s21_decimal src, float *dst) {
-  if (dst == NULL || src.bits[1] || src.bits[2] ||
-      isSetBit(src, ADDITIONAL_INT_BIT) || !isCorrectDecimal(&src))
+  if (dst == NULL || src.bits[1] || src.bits[2] || !isCorrectDecimal(&src))
     return CONVERTATION_ERROR;
 
-  if (fabs(*dst) > 0 && fabs(*dst) < 1e-28) {
-    return CONVERTATION_ERROR;
+  double tmp = 0;
+  int exp = 0;
+  for (int i = 0; i < 96; i++) {
+    if ((src.bits[i / 32] & (1 << i % 32)) != 0) tmp += pow(2, i);
+  }
+  if ((exp = getScale(src)) > 0) {
+    for (int i = exp; i > 0; i--, tmp /= 10.0);
+  }
+  *dst = (float)tmp;
+  if (isSetBit(src, MINUS_BIT_INDEX)) {
+    *dst *= -1;
   }
   if (fabs(*dst) > 7.9228162514264337593543950335e+28 || isinf(*dst)) {
     return CONVERTATION_ERROR;
   }
-  long double a = 0;
-  s21_decimal res = {0};
-  s21_truncate(src, &res);
-  int sign;
-  for (int i = 0; i < 96; i++) {
-    sign = (int)isSetBit(res, i);
-    a += sign * pow(2, i);
-  }
-  s21_decimal float_part = {0};
-  s21_sub(src, res, &float_part);
-  int scale = get_scale(src);
-  long double f_part = 0;
-  for (int i = 0; i < 96; i++) {
-    sign = (int)isSetBit(float_part, i);
-    f_part += sign * pow(2, i);
-  }
-  *dst = (float)(f_part / pow(10, scale) + a);
-  if (isSetBit(src, MINUS_BIT_INDEX)) {
-    *dst = -(*dst);
-  }
+
   return CONVERTATION_SUCCESS;
 }
