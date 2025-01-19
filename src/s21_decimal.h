@@ -86,8 +86,7 @@ void copySign(s21_decimal value_1, s21_decimal *result);
 int determineTheSizeDifference(s21_decimal value_1, s21_decimal value_2);
 
 void printDecimal(s21_decimal value);
-void div_10(s21_decimal *value);
-int s21_truncate(s21_decimal value, s21_decimal *result);
+int div_10(s21_decimal *value);
 // convertation
 int countSignificantDigits(float src);
 int calculate_scale(float src);

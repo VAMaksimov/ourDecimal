@@ -76,6 +76,7 @@ int s21_round(s21_decimal value, s21_decimal *result) {
       } else {
         s21_sub(truncated, one,
                 result);  // Для отрицательных чисел тоже добавляем
+
       }
     } else {
       *result = truncated;
