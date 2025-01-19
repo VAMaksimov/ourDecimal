@@ -59,12 +59,19 @@ int getScale(s21_decimal value) {
   return result;
 }
 
-void setScale(s21_decimal *num, int scale) {
-  // Очистим bits[3], чтобы не было "мусора"
-  num->bits[3] = 0;
+// void setScale(s21_decimal *num, int scale) {
+//   // Очистим bits[3], чтобы не было "мусора"
+//   num->bits[3] = 0;
 
-  // Установим масштаб (scale), сдвигая на 16 позиций
-  num->bits[3] |= (scale << 16);
+//   // Установим масштаб (scale), сдвигая на 16 позиций
+//   num->bits[3] |= (scale << 16);
+// }
+
+void setScale(s21_decimal *num, int scale) {
+  if (isSetBit(*num, MINUS_BIT_INDEX))
+    num->bits[3] = (scale << 16) | (1 << getColumn(MINUS_BIT_INDEX));
+  else
+    num->bits[3] = (scale << 16);
 }
 
 bool isCorrectDecimal(s21_decimal *num) {
@@ -192,23 +199,24 @@ void printDecimal(s21_decimal value) {
 //     }
 //   }
 // }
-void div_10(s21_decimal *value) {
-  for (int i = 0; i < 3; i++) {
-    value->bits[i] /= 10;
-  }
-}
 
-int s21_truncate(s21_decimal value, s21_decimal *result) {
-  if (result == NULL || !isCorrectDecimal(&value)) return 1;
-  for (int i = 0; i < 3; i++) result->bits[i] = value.bits[i];
-  int exp = getScale(value);
-  while (exp > 0) {
-    div_10(result);
-    exp--;
-  }
-  setScale(result, 0);
-  return 0;
-}
+// void div_10(s21_decimal *value) {
+//   for (int i = 0; i < 3; i++) {
+//     value->bits[i] /= 10;
+//   }
+// }
+
+// int s21_truncate(s21_decimal value, s21_decimal *result) {
+//   if (result == NULL || !isCorrectDecimal(&value)) return 1;
+//   for (int i = 0; i < 3; i++) result->bits[i] = value.bits[i];
+//   int exp = getScale(value);
+//   while (exp > 0) {
+//     div_10(result);
+//     exp--;
+//   }
+//   setScale(result, 0);
+//   return 0;
+// }
 
 int getFloatExp(float *value) {
   return ((*((int *)value) & ~(1 << 31)) >> 23) - 127;
