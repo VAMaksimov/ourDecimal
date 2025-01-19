@@ -27,5 +27,8 @@ void assertDecimal(s21_decimal expected, s21_decimal actual);
 void assertLongDecimal(s21_long_decimal expected, s21_long_decimal actual);
 Suite *convert_suite(void);
 Suite *arithmetic_suite(void);
+Suite *comparison_suite(void);
+Suite *other_suite(void);
+// Suite *div_suite(void);
 
 #endif  // TEST_H

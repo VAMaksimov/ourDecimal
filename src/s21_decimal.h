@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #define bool _Bool
 #define true 1
@@ -102,13 +103,30 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst);
 // arithmetics
 // s21_long_decimal addition(s21_long_decimal a, s21_long_decimal b,
 //                           s21_long_decimal *result);
+
 int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
+int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 
 int addWrapper(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 void addition(s21_decimal a, s21_decimal b, s21_decimal *result,
               int *errorType);
 void subtraction(s21_decimal a, s21_decimal b, s21_decimal *result,
                  int *errorType);
+// comparison
+int s21_is_greater(s21_decimal a, s21_decimal b);
+int s21_is_less(s21_decimal a, s21_decimal b);
+int s21_is_equal(s21_decimal a, s21_decimal b);
+int s21_is_not_equal(s21_decimal a, s21_decimal b);
+int s21_is_greater_or_equal(s21_decimal a, s21_decimal b);
+int s21_is_less_or_equal(s21_decimal a, s21_decimal b);
+
+// others
+int s21_truncate(s21_decimal value, s21_decimal *result);
+int s21_floor(s21_decimal value, s21_decimal *result);
+int s21_round(s21_decimal value, s21_decimal *result);
+int s21_negate(s21_decimal value, s21_decimal *result);
+int div_10(s21_decimal *value);
+
 #endif  // S21_DECIMAL_H
