@@ -85,17 +85,13 @@ void alignScale(s21_decimal *value_1, s21_decimal *value_2, int *errorType) {
   int scale_diff = scale_1 - scale_2;
 
   if (scale_diff > 0) {
-    // Увеличиваем масштаб value_2 до scale_1
     while (scale_diff-- && !(*errorType)) {
       multiplyBy10(value_2, errorType);
     }
-    if (!(*errorType)) setScale(value_2, scale_1);
   } else if (scale_diff < 0) {
-    // Увеличиваем масштаб value_1 до scale_2
     while (scale_diff++ && !(*errorType)) {
       multiplyBy10(value_1, errorType);
     }
-    if (!(*errorType)) setScale(value_1, scale_2);
   }
 }
 
