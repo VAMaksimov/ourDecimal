@@ -26,7 +26,7 @@ int s21_is_greater(s21_decimal a, s21_decimal b) {
   }
   return result;
 }
-
+//hi
 int s21_is_equal(s21_decimal a, s21_decimal b) {
   if (!isCorrectDecimal(&a) || !isCorrectDecimal(&b)) return false;
 

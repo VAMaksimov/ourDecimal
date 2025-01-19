@@ -5,12 +5,8 @@ int s21_truncate(s21_decimal value, s21_decimal *result) {
   int exp = getScale(value);
   int sign = isSetBit(value, MINUS_BIT_INDEX);
   *result = value;
-  s21_decimal ten = {0};
-  ten.bits[0] = 10;
-  ten.bits[1] = ten.bits[2] = ten.bits[3] = 0;
-  setScale(&ten, 0);
   while (exp > 0) {
-    if (s21_div(*result, ten, result) != 0) return 1;
+    div_10(result);
     exp--;
   }
   setScale(result, 0);
@@ -60,21 +56,42 @@ int s21_round(s21_decimal value, s21_decimal *result) {
     s21_decimal fractional_part = {0};
     s21_sub(value, truncated, &fractional_part);
 
+    resetBit(&fractional_part, MINUS_BIT_INDEX);
+
     s21_decimal half = {0};
     half.bits[0] = 5;
-    setScale(&half, scale);
+    setScale(&half, 1);
+
+    // Диагностика
+    // printDecimal(truncated);
+    // printDecimal(fractional_part);  // Для отладки дробной части
+    // printDecimal(half);  // Для отладки значения 0.5
 
     if (s21_is_greater_or_equal(fractional_part, half)) {
       s21_decimal one = {0};
       one.bits[0] = 1;
+
       if (!isSetBit(value, MINUS_BIT_INDEX)) {
         s21_add(truncated, one, result);
       } else {
-        s21_sub(truncated, one, result);
+        s21_sub(truncated, one,
+                result);  // Для отрицательных чисел тоже добавляем
       }
     } else {
       *result = truncated;
     }
+    setScale(result, 0);  // Устанавливаем масштаб результата в 0
   }
   return 0;
+}
+
+int div_10(s21_decimal *value) {
+  long long int tmp = 0;
+  int mod_10 = 0;
+  for (int i = 2; i >= 0; i--) {
+    tmp = mod_10 * pow(2, 32) + (unsigned)value->bits[i];
+    mod_10 = tmp % 10;
+    value->bits[i] = tmp / 10;
+  }
+  return mod_10;
 }
