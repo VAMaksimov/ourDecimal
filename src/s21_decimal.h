@@ -1,7 +1,10 @@
 #ifndef S21_DECIMAL_H
 #define S21_DECIMAL_H
 
+#include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
 #define bool _Bool
@@ -27,6 +30,11 @@ typedef struct {
 typedef struct {
   int bits[4];
 } s21_decimal;
+
+typedef union {
+  int ui;
+  float fl;
+} fbits;
 
 #define ROW_NUMBER (int)(sizeof(s21_decimal) / sizeof(int))
 #define COLUMN_NUMBER (int)(sizeof(int) * 8)
@@ -55,7 +63,7 @@ void negateDecimal(s21_decimal *dst);
 
 bool isSetBit(s21_decimal number, int index);
 bool isSetLongBit(s21_long_decimal dst, int index);
-
+bool isScaleSet(s21_decimal dst);
 void setBit(s21_decimal *dst, int index);
 void setLongBit(s21_long_decimal *dst, int index);
 
@@ -78,11 +86,20 @@ void copySign(s21_decimal value_1, s21_decimal *result);
 int determineTheSizeDifference(s21_decimal value_1, s21_decimal value_2);
 
 void printDecimal(s21_decimal value);
-
+void div_10(s21_decimal *value);
+int s21_truncate(s21_decimal value, s21_decimal *result);
 // convertation
+int countSignificantDigits(float src);
+int calculate_scale(float src);
+int getFloatExp(float *value);
+
+s21_decimal *setBitFloat(s21_decimal *value, int pos, int bit);
+void setNegativeSign(s21_decimal *value, int bit);
 int s21_from_int_to_decimal(int src, s21_decimal *dst);
 int s21_from_decimal_to_int(s21_decimal src, int *dst);
 
+int s21_from_decimal_to_float(s21_decimal src, float *dst);
+int s21_from_float_to_decimal(float src, s21_decimal *dst);
 // arithmetics
 // s21_long_decimal addition(s21_long_decimal a, s21_long_decimal b,
 //                           s21_long_decimal *result);
@@ -97,7 +114,6 @@ void addition(s21_decimal a, s21_decimal b, s21_decimal *result,
               int *errorType);
 void subtraction(s21_decimal a, s21_decimal b, s21_decimal *result,
                  int *errorType);
-
 // comparison
 int s21_is_greater(s21_decimal a, s21_decimal b);
 int s21_is_less(s21_decimal a, s21_decimal b);

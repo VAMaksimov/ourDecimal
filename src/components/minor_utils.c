@@ -23,6 +23,7 @@ void negateDecimal(s21_decimal *dst) {
 bool isSetBit(s21_decimal dst, int index) {
   return (dst.bits[getRow(index)] & (1 << getColumn(index)));
 }
+bool isScaleSet(s21_decimal dst) { return (dst.bits[3] & 0x00FF0000); }
 
 bool isSetLongBit(s21_long_decimal dst, int index) {
   return (dst.bits[getRow(index)] & (1 << getColumn(index)));
@@ -53,13 +54,17 @@ bool isDecimalZero(s21_decimal num) {
          num.bits[3] == 0;
 }
 
-int getScale(s21_decimal num) { return (num.bits[3] << 1) >> 17; }
+int getScale(s21_decimal value) {
+  int result = (char)(value.bits[3] >> 16);
+  return result;
+}
 
 void setScale(s21_decimal *num, int scale) {
-  if (isSetBit(*num, MINUS_BIT_INDEX))
-    num->bits[3] = (scale << 16) | (1 << getColumn(MINUS_BIT_INDEX));
-  else
-    num->bits[3] = (scale << 16);
+  // Очистим bits[3], чтобы не было "мусора"
+  num->bits[3] = 0;
+
+  // Установим масштаб (scale), сдвигая на 16 позиций
+  num->bits[3] |= (scale << 16);
 }
 
 bool isCorrectDecimal(s21_decimal *num) {
@@ -187,17 +192,36 @@ void printDecimal(s21_decimal value) {
 //     }
 //   }
 // }
+void div_10(s21_decimal *value) {
+  for (int i = 0; i < 3; i++) {
+    value->bits[i] /= 10;
+  }
+}
 
-// bool s21_truncate(s21_decimal *value) {
-//   if (result == NULL || !correct_decimal(&value)) return 1;
-//   for (int i = 0; i < 3; i++) result->bits[i] = value.bits[i];
-//   int exp = getScale(value);
-//   int sign = get_sign(value);
-//   while (exp > 0) {
-//     div_10(result);
-//     exp--;
-//   }
-//   set_scale(result, 0);
-//   set_sign(result, sign);
-//   return 0;
-// }
+int s21_truncate(s21_decimal value, s21_decimal *result) {
+  if (result == NULL || !isCorrectDecimal(&value)) return 1;
+  for (int i = 0; i < 3; i++) result->bits[i] = value.bits[i];
+  int exp = getScale(value);
+  while (exp > 0) {
+    div_10(result);
+    exp--;
+  }
+  setScale(result, 0);
+  return 0;
+}
+
+int getFloatExp(float *value) {
+  return ((*((int *)value) & ~(1 << 31)) >> 23) - 127;
+}
+
+s21_decimal *setBitFloat(s21_decimal *value, int pos, int bit) {
+  if (pos / 32 < 4 && bit)
+    value->bits[pos / 32] |= (1 << (pos % 32));
+  else if (pos / 32 < 4 && !bit)
+    value->bits[pos / 32] &= ~(1 << (pos % 32));
+  return value;
+}
+void setNegativeSign(s21_decimal *value, int bit) {
+  value->bits[3] =
+      (bit) ? (value->bits[3] | (1u << 31)) : (value->bits[3] & ~(1 << 31));
+}
