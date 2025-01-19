@@ -55,6 +55,7 @@ int s21_round(s21_decimal value, s21_decimal *result) {
 
     s21_decimal fractional_part = {0};
     s21_sub(value, truncated, &fractional_part);
+
     resetBit(&fractional_part, MINUS_BIT_INDEX);
 
     s21_decimal half = {0};
