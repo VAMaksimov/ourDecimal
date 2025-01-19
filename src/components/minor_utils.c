@@ -67,14 +67,35 @@ bool isCorrectDecimal(s21_decimal *num) {
          !(num->bits[3] & (0b01111111000000001111111111111111));
 }
 
+// void alignScale(s21_decimal *value_1, s21_decimal *value_2, int *errorType) {
+//   int scale_1 = getScale(*value_1), scale_2 = getScale(*value_2);
+//   int scale_diff = scale_1 - scale_2;
+
+//   if (scale_diff > 0) {
+//     while (scale_diff--) multiplyBy10(value_2, errorType);
+//     // setScale(value_1, getScale(*value_2));
+//   } else if (scale_diff < 0) {
+//     while (scale_diff++) multiplyBy10(value_1, errorType);
+//     // setScale(value_2, getScale(*value_1));
+//   }
+// }
+
 void alignScale(s21_decimal *value_1, s21_decimal *value_2, int *errorType) {
   int scale_1 = getScale(*value_1), scale_2 = getScale(*value_2);
   int scale_diff = scale_1 - scale_2;
 
   if (scale_diff > 0) {
-    while (scale_diff--) multiplyBy10(value_2, errorType);
+    // Увеличиваем масштаб value_2 до scale_1
+    while (scale_diff-- && !(*errorType)) {
+      multiplyBy10(value_2, errorType);
+    }
+    if (!(*errorType)) setScale(value_2, scale_1);
   } else if (scale_diff < 0) {
-    while (scale_diff++) multiplyBy10(value_1, errorType);
+    // Увеличиваем масштаб value_1 до scale_2
+    while (scale_diff++ && !(*errorType)) {
+      multiplyBy10(value_1, errorType);
+    }
+    if (!(*errorType)) setScale(value_1, scale_2);
   }
 }
 
@@ -148,7 +169,7 @@ void printDecimal(s21_decimal value) {
       }
       if (j % 8 == 0) printf(" ");
     }
-    printf("= %u = 0x%X\n", value.bits[i], value.bits[i]);
+    printf("=(%u) = 0x%X\n", value.bits[i], value.bits[i]);
   }
 }
 

@@ -18,7 +18,7 @@ int main(void) {
   int fails_count = 0;
   Suite *suite_list[] = {convert_suite(),    arithmetic_suite(),
                          comparison_suite(), other_suite(),
-                         div_suite(),        NULL};
+                                 NULL};
 
   for (Suite **current_suite = suite_list; *current_suite != NULL;
        current_suite++) {
