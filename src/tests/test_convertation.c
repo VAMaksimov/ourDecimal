@@ -115,6 +115,24 @@ START_TEST(standard_10) {
 }
 END_TEST
 
+START_TEST(standard_11) {
+  s21_decimal subject = {{0x74CBB1, 0, 0, __POSITIVE_AND_SCALE_EQUALS_1__}};
+  int actual, expected = 765432;
+  int result = s21_from_decimal_to_int(subject, &actual);
+  ck_assert_int_eq(expected, actual);
+  ck_assert_int_eq(result, CONVERTATION_SUCCESS);
+}
+END_TEST
+
+START_TEST(standard_12) {
+  s21_decimal subject = {{0x74CBB1, 0, 0, __POSITIVE_AND_SCALE_EQUALS_2__}};
+  int actual, expected = 76543;
+  int result = s21_from_decimal_to_int(subject, &actual);
+  ck_assert_int_eq(expected, actual);
+  ck_assert_int_eq(result, CONVERTATION_SUCCESS);
+}
+END_TEST
+
 START_TEST(border_4) {
   s21_decimal subject = {
       {__DECIMAL_LOWER_MIDPOINT__, 0, 0, __DECIMAL_POSITIVE_INT_INFO__}};
@@ -337,6 +355,8 @@ Suite *convert_suite(void) {
   tcase_add_test(dec_to_int, standard_8);
   tcase_add_test(dec_to_int, standard_9);
   tcase_add_test(dec_to_int, standard_10);
+  tcase_add_test(dec_to_int, standard_11);
+  tcase_add_test(dec_to_int, standard_12);
   tcase_add_test(dec_to_int, border_4);
   tcase_add_test(dec_to_int, irregular_1);
   tcase_add_test(dec_to_int, irregular_2);

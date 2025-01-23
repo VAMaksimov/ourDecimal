@@ -1,10 +1,5 @@
 #include "../s21_decimal.h"
 
-/**
- * @brief convert int to decimal
- * @param src int value
- * @param dst pointer to the decimal structure
- */
 int s21_from_int_to_decimal(int src, s21_decimal *dst) {
   if (dst == NULL) return CONVERTATION_ERROR;
 
@@ -16,11 +11,6 @@ int s21_from_int_to_decimal(int src, s21_decimal *dst) {
   return CONVERTATION_SUCCESS;
 }
 
-/**
- * @brief converts decimal to int
- * @param src decimal value
- * @param dst pointer to the int structure
- */
 int s21_from_decimal_to_int(s21_decimal src, int *dst) {
   if (dst == NULL || src.bits[1] || src.bits[2] ||
       isSetBit(src, ADDITIONAL_INT_BIT) || !isCorrectDecimal(&src))
@@ -38,13 +28,8 @@ int s21_from_decimal_to_int(s21_decimal src, int *dst) {
 }
 
 int s21_from_float_to_decimal(float src, s21_decimal *dst) {
-  if (!dst) {
-    return CONVERTATION_ERROR;
-  }
-  if (abs(src) > 0 && abs(src) < 1e-28) {
-    return CONVERTATION_ERROR;
-  }
-  if (abs(src) > 7.9228162514264337593543950335e+28 || isinf(src)) {
+  if (!dst || (abs(src) > 0 && abs(src) < 1e-28) ||
+      (abs(src) > 7.9228162514264337593543950335e+28 || isinf(src))) {
     return CONVERTATION_ERROR;
   }
   int exp = getFloatExp(&src);
@@ -65,7 +50,8 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
   if (scale <= 28 && (exp > -94 && exp < 96)) {
     fbits mant;
     tmp = (float)tmp;
-    for (; fmod(tmp, 10) == 0 && scale > 0; scale--, tmp /= 10) {
+    for (; fmod(tmp, 10) == 0 && scale > 0; scale--) {
+      tmp /= 10;
     }
     mant.fl = tmp;
     exp = getFloatExp(&mant.fl);
@@ -91,19 +77,20 @@ int s21_from_decimal_to_float(s21_decimal src, float *dst) {
 
   double tmp = 0;
   int exp = 0;
-  for (int i = 0; i < 96; i++) {
-    if ((src.bits[i / 32] & (1 << i % 32)) != 0) tmp += pow(2, i);
+  for (int i = 0; i < VALUE_PART_SIZE; i++) {
+    if (isSetBit(src, i)) tmp += pow(2, i);
   }
   if ((exp = getScale(src)) > 0) {
-    for (int i = exp; i > 0; i--, tmp /= 10.0);
+    for (int i = exp; i > 0; i--) tmp /= 10.0;
   }
   *dst = (float)tmp;
   if (isSetBit(src, MINUS_BIT_INDEX)) {
     *dst *= -1;
   }
+  int errorType = CONVERTATION_SUCCESS;
   if (fabs(*dst) > 7.9228162514264337593543950335e+28 || isinf(*dst)) {
-    return CONVERTATION_ERROR;
+    errorType = CONVERTATION_ERROR;
   }
 
-  return CONVERTATION_SUCCESS;
+  return errorType;
 }

@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
 #define bool _Bool
 #define true 1
@@ -40,7 +39,7 @@ typedef union {
 #define COLUMN_NUMBER (int)(sizeof(int) * 8)
 #define DECIMAL_SIZE (ROW_NUMBER * COLUMN_NUMBER)
 #define ADDITIONAL_INT_BIT (COLUMN_NUMBER - 1)
-#define VALUE_PART_SIZE (3 * COLUMN_NUMBER)
+#define VALUE_PART_SIZE (3 * COLUMN_NUMBER) // 96
 #define MINUS_BIT_INDEX (ROW_NUMBER * COLUMN_NUMBER - 1)
 
 #define LONG_ROW_NUMBER (int)(sizeof(s21_long_decimal) / sizeof(int))
@@ -87,22 +86,21 @@ int determineTheSizeDifference(s21_decimal value_1, s21_decimal value_2);
 
 void printDecimal(s21_decimal value);
 int div_10(s21_decimal *value);
+
 // convertation
-int countSignificantDigits(float src);
-int calculate_scale(float src);
+// int countSignificantDigits(float src);
+// int calculate_scale(float src);
 int getFloatExp(float *value);
 
 s21_decimal *setBitFloat(s21_decimal *value, int pos, int bit);
 void setNegativeSign(s21_decimal *value, int bit);
+
 int s21_from_int_to_decimal(int src, s21_decimal *dst);
 int s21_from_decimal_to_int(s21_decimal src, int *dst);
-
 int s21_from_decimal_to_float(s21_decimal src, float *dst);
 int s21_from_float_to_decimal(float src, s21_decimal *dst);
-// arithmetics
-// s21_long_decimal addition(s21_long_decimal a, s21_long_decimal b,
-//                           s21_long_decimal *result);
 
+// arithmetics
 int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
@@ -128,4 +126,4 @@ int s21_round(s21_decimal value, s21_decimal *result);
 int s21_negate(s21_decimal value, s21_decimal *result);
 int div_10(s21_decimal *value);
 
-#endif  // S21_DECIMAL_H
+#endif // S21_DECIMAL_H

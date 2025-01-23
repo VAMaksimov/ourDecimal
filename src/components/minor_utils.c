@@ -59,14 +59,6 @@ int getScale(s21_decimal value) {
   return result;
 }
 
-// void setScale(s21_decimal *num, int scale) {
-//   // Очистим bits[3], чтобы не было "мусора"
-//   num->bits[3] = 0;
-
-//   // Установим масштаб (scale), сдвигая на 16 позиций
-//   num->bits[3] |= (scale << 16);
-// }
-
 void setScale(s21_decimal *num, int scale) {
   if (isSetBit(*num, MINUS_BIT_INDEX))
     num->bits[3] = (scale << 16) | (1 << getColumn(MINUS_BIT_INDEX));
@@ -78,19 +70,6 @@ bool isCorrectDecimal(s21_decimal *num) {
   return num != NULL && getScale(*num) <= 28 &&
          !(num->bits[3] & (0b01111111000000001111111111111111));
 }
-
-// void alignScale(s21_decimal *value_1, s21_decimal *value_2, int *errorType) {
-//   int scale_1 = getScale(*value_1), scale_2 = getScale(*value_2);
-//   int scale_diff = scale_1 - scale_2;
-
-//   if (scale_diff > 0) {
-//     while (scale_diff--) multiplyBy10(value_2, errorType);
-//     // setScale(value_1, getScale(*value_2));
-//   } else if (scale_diff < 0) {
-//     while (scale_diff++) multiplyBy10(value_1, errorType);
-//     // setScale(value_2, getScale(*value_1));
-//   }
-// }
 
 void alignScale(s21_decimal *value_1, s21_decimal *value_2, int *errorType) {
   int scale_1 = getScale(*value_1), scale_2 = getScale(*value_2);
@@ -181,6 +160,22 @@ void printDecimal(s21_decimal value) {
   }
 }
 
+int getFloatExp(float *value) {
+  return ((*((int *)value) & ~(1 << 31)) >> 23) - 127;
+}
+
+s21_decimal *setBitFloat(s21_decimal *value, int pos, int bit) {
+  if (pos / 32 < 4 && bit)
+    value->bits[pos / 32] |= (1 << (pos % 32));
+  else if (pos / 32 < 4 && !bit)
+    value->bits[pos / 32] &= ~(1 << (pos % 32));
+  return value;
+}
+void setNegativeSign(s21_decimal *value, int bit) {
+  value->bits[3] =
+      (bit) ? (value->bits[3] | (1u << 31)) : (value->bits[3] & ~(1 << 31));
+}
+
 // void longNormalization(s21_long_decimal *value_1, s21_long_decimal
 // *value_2)
 // {
@@ -199,37 +194,3 @@ void printDecimal(s21_decimal value) {
 //     }
 //   }
 // }
-
-// void div_10(s21_decimal *value) {
-//   for (int i = 0; i < 3; i++) {
-//     value->bits[i] /= 10;
-//   }
-// }
-
-// int s21_truncate(s21_decimal value, s21_decimal *result) {
-//   if (result == NULL || !isCorrectDecimal(&value)) return 1;
-//   for (int i = 0; i < 3; i++) result->bits[i] = value.bits[i];
-//   int exp = getScale(value);
-//   while (exp > 0) {
-//     div_10(result);
-//     exp--;
-//   }
-//   setScale(result, 0);
-//   return 0;
-// }
-
-int getFloatExp(float *value) {
-  return ((*((int *)value) & ~(1 << 31)) >> 23) - 127;
-}
-
-s21_decimal *setBitFloat(s21_decimal *value, int pos, int bit) {
-  if (pos / 32 < 4 && bit)
-    value->bits[pos / 32] |= (1 << (pos % 32));
-  else if (pos / 32 < 4 && !bit)
-    value->bits[pos / 32] &= ~(1 << (pos % 32));
-  return value;
-}
-void setNegativeSign(s21_decimal *value, int bit) {
-  value->bits[3] =
-      (bit) ? (value->bits[3] | (1u << 31)) : (value->bits[3] & ~(1 << 31));
-}
